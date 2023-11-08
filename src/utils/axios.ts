@@ -14,14 +14,15 @@ axiosInstance.interceptors.response.use(
 export default axiosInstance;
 
 export const API_ENDPOINTS = {
+  auth: {
+    me: '/auth/me',
+    login: '/auth/login',
+    register: '/auth/register',
+    refresh: '/auth/refresh',
+  },
   chat: '/api/chat',
   kanban: '/api/kanban',
   calendar: '/api/calendar',
-  auth: {
-    me: '/api/auth/me',
-    login: '/api/auth/login',
-    register: '/api/auth/register',
-  },
   mail: {
     list: '/api/mail/list',
     details: '/api/mail/details',
