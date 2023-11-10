@@ -1,6 +1,6 @@
 {
-  "name": "Minimal UI",
-  "short_name": "Minimal UI",
+  "name": "Telemed Smart Link",
+  "short_name": "Telemed Smart Link",
   "display": "standalone",
   "start_url": "/",
   "theme_color": "#000000",

@@ -49,11 +49,10 @@ export function useNavData() {
       // OVERVIEW
       // ----------------------------------------------------------------------
       {
-        subheader: 'overview v5.0.0',
+        subheader: 'overview v1.0.0',
         items: [
-          { title: 'one', path: paths.dashboard.root, icon: ICONS.dashboard },
-          { title: 'two', path: paths.dashboard.two, icon: ICONS.ecommerce },
-          { title: 'three', path: paths.dashboard.three, icon: ICONS.analytics },
+          { title: 'สรุป', path: paths.dashboard.root, icon: ICONS.dashboard },
+          // { title: 'analytics', path: paths.dashboard.three, icon: ICONS.analytics },
         ],
       },
 
@@ -62,16 +61,7 @@ export function useNavData() {
       {
         subheader: 'management',
         items: [
-          {
-            title: 'user',
-            path: paths.dashboard.group.root,
-            icon: ICONS.user,
-            children: [
-              { title: 'four', path: paths.dashboard.group.root },
-              { title: 'five', path: paths.dashboard.group.five },
-              { title: 'six', path: paths.dashboard.group.six },
-            ],
-          },
+          // Add menu here...
         ],
       },
     ],
