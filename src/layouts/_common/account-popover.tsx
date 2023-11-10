@@ -22,16 +22,8 @@ import CustomPopover, { usePopover } from 'src/components/custom-popover';
 
 const OPTIONS = [
   {
-    label: 'Home',
-    linkTo: '/',
-  },
-  {
-    label: 'Profile',
-    linkTo: '/#1',
-  },
-  {
-    label: 'Settings',
-    linkTo: '/#2',
+    label: 'การตั้งค่า',
+    linkTo: '/#settings',
   },
 ];
 
@@ -95,10 +87,6 @@ export default function AccountPopover() {
           <Typography variant="subtitle2" noWrap>
             {user?.displayName}
           </Typography>
-
-          <Typography variant="body2" sx={{ color: 'text.secondary' }} noWrap>
-            {user?.email}
-          </Typography>
         </Box>
 
         <Divider sx={{ borderStyle: 'dashed' }} />
@@ -117,7 +105,7 @@ export default function AccountPopover() {
           onClick={handleLogout}
           sx={{ m: 1, fontWeight: 'fontWeightBold', color: 'error.main' }}
         >
-          Logout
+          ออกจากระบบ
         </MenuItem>
       </CustomPopover>
     </>
