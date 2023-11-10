@@ -67,6 +67,11 @@ export function useNavData() {
             icon: ICONS.menuItem,
           },
           {
+            title: 'ข้อมูลยา',
+            path: paths.dashboard.drug.root,
+            icon: ICONS.menuItem,
+          },
+          {
             title: 'ข้อมูลกลุ่มยา',
             path: paths.dashboard.drugCategory.root,
             icon: ICONS.menuItem,

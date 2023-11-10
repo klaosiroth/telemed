@@ -27,6 +27,11 @@ export const paths = {
       details: (id: string) => `${ROOTS.DASHBOARD}/ambulance/${id}`,
       edit: (id: string) => `${ROOTS.DASHBOARD}/ambulance/${id}/edit`,
     },
+    drug: {
+      root: `${ROOTS.DASHBOARD}/drug`,
+      new: `${ROOTS.DASHBOARD}/drug/new`,
+      edit: (id: string) => `${ROOTS.DASHBOARD}/drug/${id}/edit`,
+    },
     drugCategory: {
       root: `${ROOTS.DASHBOARD}/drug-category`,
       new: `${ROOTS.DASHBOARD}/drug-category/new`,

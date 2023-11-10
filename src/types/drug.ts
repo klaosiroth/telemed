@@ -6,9 +6,22 @@ export type TableFilters = {
 
 // ----------------------------------------------------------------------
 
-export type Drug = {};
+export type Drug = {
+  drugId: string;
+  drugName: string;
+  drugDetail: string;
+  drugGenericName: string;
+  isActive: boolean;
+  drugCategory: DrugCategory;
+  drugCategoryId: string;
+};
 
-export type CreateDrugDTO = {};
+export type CreateDrugDTO = {
+  drugName: string;
+  drugDetail: string;
+  drugGenericName: string;
+  drugCategoryId?: string;
+};
 
 export type DrugCategory = {
   drugCategoryId: string;
