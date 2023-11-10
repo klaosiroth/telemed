@@ -14,6 +14,7 @@ axiosInstance.interceptors.response.use(
 export default axiosInstance;
 
 export const API_ENDPOINTS = {
+  ambulances: '/ambulances',
   auth: {
     me: '/auth/me',
     login: '/auth/login',

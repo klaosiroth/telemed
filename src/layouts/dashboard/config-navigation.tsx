@@ -61,7 +61,11 @@ export function useNavData() {
       {
         subheader: 'management',
         items: [
-          // Add menu here...
+          {
+            title: 'ข้อมูลรถพยาบาล',
+            path: paths.dashboard.ambulance.root,
+            icon: ICONS.menuItem,
+          },
         ],
       },
     ],
