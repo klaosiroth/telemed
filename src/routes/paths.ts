@@ -21,5 +21,11 @@ export const paths = {
   dashboard: {
     root: ROOTS.DASHBOARD,
     analytics: `${ROOTS.DASHBOARD}/analytics`,
+    ambulance: {
+      root: `${ROOTS.DASHBOARD}/ambulance`,
+      new: `${ROOTS.DASHBOARD}/ambulance/new`,
+      details: (id: string) => `${ROOTS.DASHBOARD}/ambulance/${id}`,
+      edit: (id: string) => `${ROOTS.DASHBOARD}/ambulance/${id}/edit`,
+    },
   },
 };
