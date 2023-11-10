@@ -15,6 +15,7 @@ export default axiosInstance;
 
 export const API_ENDPOINTS = {
   ambulances: '/ambulances',
+  drugs: '/drugs',
   drugCategories: '/drugCategories',
   auth: {
     me: '/auth/me',
