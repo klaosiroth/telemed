@@ -62,6 +62,11 @@ export function useNavData() {
         subheader: 'management',
         items: [
           {
+            title: 'ปฏิบัติภารกิจ',
+            path: paths.dashboard.case.new,
+            icon: ICONS.menuItem,
+          },
+          {
             title: 'ข้อมูลรถพยาบาล',
             path: paths.dashboard.ambulance.root,
             icon: ICONS.menuItem,
