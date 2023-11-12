@@ -76,6 +76,11 @@ export function useNavData() {
             path: paths.dashboard.drugCategory.root,
             icon: ICONS.menuItem,
           },
+          {
+            title: 'ข้อมูลผู้ป่วย',
+            path: paths.dashboard.patient.root,
+            icon: ICONS.menuItem,
+          },
         ],
       },
     ],
