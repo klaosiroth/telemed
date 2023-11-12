@@ -17,6 +17,7 @@ export const API_ENDPOINTS = {
   ambulances: '/ambulances',
   drugs: '/drugs',
   drugCategories: '/drugCategories',
+  patients: '/patients',
   auth: {
     me: '/auth/me',
     login: '/auth/login',
