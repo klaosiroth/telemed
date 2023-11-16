@@ -30,6 +30,7 @@ export const paths = {
     case: {
       root: `${ROOTS.DASHBOARD}/case`,
       new: `${ROOTS.DASHBOARD}/case/new`,
+      details: (id: string) => `${ROOTS.DASHBOARD}/case/${id}`,
       edit: (id: string) => `${ROOTS.DASHBOARD}/case/${id}/edit`,
     },
     drug: {
