@@ -15,5 +15,5 @@ module.exports = {
     });
     return config;
   },
-  output: 'export',
+  // output: 'export',
 };
