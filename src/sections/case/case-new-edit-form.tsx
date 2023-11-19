@@ -79,10 +79,11 @@ export default function CaseNewEditForm({ currentData }: Props) {
         const newCaseId = response.data.caseId;
         const caseMissionData = {
           caseId: newCaseId,
+          // * Set default values for new case mission
           // prefixModal: 1,
           // dateStartMission: new Date(),
         };
-        await axiosInstance.post(API_ENDPOINTS.caseMissions.startMission, { caseMissionData });
+        await axiosInstance.post(API_ENDPOINTS.caseMissions.start, { caseMissionData });
         router.push(paths.dashboard.case.details(newCaseId));
         console.info('Form submitted:', data, caseMissionData);
       } catch (error) {
