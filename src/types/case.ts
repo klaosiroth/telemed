@@ -1,18 +1,18 @@
-// export type Case = {
-//   caseNo?: string;
-//   prefixModal: number;
-//   firstname?: string;
-//   lastname?: string;
-//   birthdate?: Date | string | null;
-//   idcard?: string;
-//   idcardExpireDate?: Date | string | null;
-//   passportNo?: string;
-//   passportExpireDate?: Date | string | null;
-//   phone?: string;
-//   mobile?: string;
-//   isActive?: boolean;
-//   severityLevel: number;
-// };
+export type ICase = {
+  caseNo?: string;
+  prefixModal: number;
+  firstname?: string;
+  lastname?: string;
+  birthdate?: Date | string | null;
+  idcard?: string;
+  idcardExpireDate?: Date | string | null;
+  passportNo?: string;
+  passportExpireDate?: Date | string | null;
+  phone?: string;
+  mobile?: string;
+  isActive?: boolean;
+  severityLevel: number;
+};
 
 export type Case = {
   caseId: string;
