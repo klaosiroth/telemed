@@ -8,9 +8,10 @@ import Container from '@mui/material/Container';
 //
 import CaseChat from '../case-chat';
 import CaseMission from '../case-mission';
-import styles from '../case-mission.module.css';
 import CaseDetailsDispenser from '../case-details-dispenser';
+import CaseLocationTracker from '../case-location-tracker';
 import VideoPlayer from '../case-video-player';
+import styles from '../case-mission.module.css';
 
 const TABS = [
   { value: 'map', label: 'แผนที่' },
@@ -35,8 +36,8 @@ export default function CaseDetailsView() {
                 <Tab key={tab.value} value={tab.value} label={tab.label} />
               ))}
             </Tabs>
-            {currentTab === 'map' && <>MAP</>}
-            {currentTab === 'info' && <>PATIENT</>}
+            {currentTab === 'map' && <CaseLocationTracker />}
+            {currentTab === 'info' && <>ข้อมูลผู้ป่วย</>}
           </div>
           <div className={styles.status}>
             <div className={styles.statusTitle}>รายละเอียด</div>
