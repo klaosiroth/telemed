@@ -3,6 +3,7 @@ import { useEffect, useRef, useState } from 'react';
 import { MapContainer, TileLayer, Marker, Popup } from 'react-leaflet';
 import L from 'leaflet';
 import 'leaflet/dist/leaflet.css';
+import './case.css';
 
 // Convert the SVG to a data URL
 const svgString = `
