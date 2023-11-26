@@ -6,11 +6,11 @@ import Tabs from '@mui/material/Tabs';
 import Card from '@mui/material/Card';
 import Container from '@mui/material/Container';
 //
-import CaseChat from '../case-chat';
 import CaseMission from '../case-mission';
 import CaseDetailsDispenser from '../case-details-dispenser';
 import CaseLocationTracker from '../case-location-tracker';
 import VideoPlayer from '../case-video-player';
+import Chat from '../chat';
 import styles from '../case-mission.module.css';
 
 const TABS = [
@@ -97,7 +97,7 @@ export default function CaseDetailsView() {
           <VideoPlayer />
         </section>
         <aside className={styles.sidebar}>
-          <CaseChat />
+          <Chat />
         </aside>
         <section className={styles.note}>
           <CaseDetailsDispenser />
