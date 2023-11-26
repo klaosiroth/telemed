@@ -1,0 +1,95 @@
+.gridContainer {
+  display: grid;
+  grid-template-areas:
+    "menu menu menu menu"
+    "main main main sidebar"
+    "video video video note";
+  grid-template-columns: repeat(4, 1fr);
+  grid-template-rows: 50px auto 200px;
+  gap: 0.5rem;
+  height: calc(100vh - 96px);
+  margin-bottom: -96px;
+}
+
+.menu {
+  grid-area: menu;
+  display: flex;
+  gap: 0.5rem;
+
+}
+
+.menuItem {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  height: 100%;
+  position: relative;
+}
+
+.menuItem::before {
+  content: "";
+  display: inline-block;
+  vertical-align: middle;
+  height: 100%;
+}
+
+.menuItem span {
+  display: inline-block;
+  vertical-align: middle;
+}
+
+.main {
+  grid-area: main;
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 1rem;
+}
+
+.status {
+  
+}
+
+.statusTitle {
+  font-size: 0.875rem;
+  font-weight: 600;
+  line-height: 48px;
+  min-height: 48px;
+}
+
+.statusBlocks {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  grid-template-rows: repeat(4, 1fr);
+  min-height: calc(100% - 48px);
+  gap: 0.5rem;
+}
+
+.statusBlock {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-direction: column;
+  text-align: center;
+}
+
+.videoContainer {
+  grid-area: video;
+  display: inline-flex;
+  gap: 0.5rem;
+}
+
+.video {
+  flex: 1;
+  /* width: calc(200px * 16 / 9); */
+}
+
+.sidebar {
+  grid-area: sidebar;
+}
+
+.note {
+  grid-area: note;
+}
+
