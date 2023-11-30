@@ -2,7 +2,7 @@ import * as Yup from 'yup';
 import { yupResolver } from '@hookform/resolvers/yup';
 import { useCallback, useMemo } from 'react';
 import { useForm } from 'react-hook-form';
-import Box from '@mui/material/Box';
+import Stack from '@mui/material/Stack';
 import Button from '@mui/material/Button';
 import Dialog from '@mui/material/Dialog';
 import DialogTitle from '@mui/material/DialogTitle';
@@ -10,7 +10,23 @@ import DialogActions from '@mui/material/DialogActions';
 import DialogContent from '@mui/material/DialogContent';
 import LoadingButton from '@mui/lab/LoadingButton';
 
-import FormProvider, { RHFTextField } from 'src/components/hook-form';
+import FormProvider, { RHFAutocomplete, RHFTextField } from 'src/components/hook-form';
+
+const OPTIONS = [
+  { value: 'option 1', label: 'Option 1' },
+  { value: 'option 2', label: 'Option 2' },
+  { value: 'option 3', label: 'Option 3' },
+  { value: 'option 4', label: 'Option 4' },
+  { value: 'option 5', label: 'Option 5' },
+  { value: 'option 6', label: 'Option 6' },
+  { value: 'option 7', label: 'Option 7' },
+  { value: 'option 8', label: 'Option 8' },
+];
+
+type OptionType = {
+  value: string;
+  label: string;
+};
 
 type Props = {
   open: boolean;
@@ -25,9 +41,14 @@ export default function CaseDetailsDispenserForm({ currentData, open, onClose }:
     // Define validation schema
   });
 
-  const defaultValues = useMemo(() => {
-    // ...
-  }, []);
+  const defaultValues = useMemo(
+    () => ({
+      drugId: currentData?.drugId || '',
+      dosage: currentData?.dosage || '',
+    }),
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    [currentData]
+  );
 
   const methods = useForm<FormValuesProps>({
     resolver: yupResolver(Schema),
@@ -35,17 +56,24 @@ export default function CaseDetailsDispenserForm({ currentData, open, onClose }:
   });
 
   const {
+    reset,
     handleSubmit,
     formState: { isSubmitting },
   } = methods;
 
-  const onSubmit = useCallback(async (data: FormValuesProps) => {
-    try {
-      // ..,
-    } catch (error) {
-      console.error(error);
-    }
-  }, []);
+  const onSubmit = useCallback(
+    async (data: FormValuesProps) => {
+      try {
+        await new Promise((resolve) => setTimeout(resolve, 500));
+        reset();
+        onClose();
+        console.info('DATA', data);
+      } catch (error) {
+        console.error(error);
+      }
+    },
+    [onClose, reset]
+  );
 
   return (
     <Dialog
@@ -54,39 +82,52 @@ export default function CaseDetailsDispenserForm({ currentData, open, onClose }:
       fullWidth
       maxWidth={false}
       PaperProps={{
-        sx: { maxWidth: 720 },
+        sx: { maxWidth: 480 },
       }}
     >
       <FormProvider methods={methods} onSubmit={handleSubmit(onSubmit)}>
         <DialogTitle>การจ่ายยา</DialogTitle>
+
         <DialogContent>
-          <Box
-            rowGap={3}
-            columnGap={2}
-            display="grid"
-            gridTemplateColumns={{
-              xs: 'repeat(1, 1fr)',
-              sm: 'repeat(2, 1fr)',
-            }}
-            mt={1}
-          >
-            <RHFTextField name="field1" label="ฟิลด์ที่1" />
-            <RHFTextField name="field2" label="ฟิลด์ที่2" />
-            <RHFTextField name="field3" label="ฟิลด์ที่3" />
-            <RHFTextField name="field4" label="ฟิลด์ที่4" />
-          </Box>
+          <Stack spacing={2} mt={1}>
+            <RHFAutocomplete
+              name="autocomplete"
+              label="กลุ่มยา"
+              options={OPTIONS}
+              getOptionLabel={(option: OptionType | string) => (option as OptionType).label}
+              isOptionEqualToValue={(option, value) => option.value === value.value}
+              renderOption={(props, option) => (
+                <li {...props} key={option.value}>
+                  {option.label}
+                </li>
+              )}
+            />
+            <RHFAutocomplete
+              name="autocomplete"
+              label="ยา"
+              options={OPTIONS}
+              getOptionLabel={(option: OptionType | string) => (option as OptionType).label}
+              isOptionEqualToValue={(option, value) => option.value === value.value}
+              renderOption={(props, option) => (
+                <li {...props} key={option.value}>
+                  {option.label}
+                </li>
+              )}
+            />
+            <RHFTextField name="dosage" label="จำนวน/หน่วย" />
+          </Stack>
         </DialogContent>
+
+        <DialogActions>
+          <Button variant="outlined" onClick={onClose}>
+            ยกเลิก
+          </Button>
+
+          <LoadingButton type="submit" variant="contained" loading={isSubmitting}>
+            บันทึก
+          </LoadingButton>
+        </DialogActions>
       </FormProvider>
-
-      <DialogActions>
-        <Button variant="outlined" onClick={onClose}>
-          ยกเลิก
-        </Button>
-
-        <LoadingButton type="submit" variant="contained" loading={isSubmitting}>
-          บันทึก
-        </LoadingButton>
-      </DialogActions>
     </Dialog>
   );
 }
