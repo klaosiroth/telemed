@@ -16,6 +16,7 @@ export default axiosInstance;
 export const API_ENDPOINTS = {
   ambulances: '/ambulances',
   cases: '/cases',
+  caseDrugs: '/caseDrugs',
   caseMissions: {
     start: '/caseMissions/startMission',
     arrive: '/caseMissions/arriveIncident',
@@ -24,6 +25,7 @@ export const API_ENDPOINTS = {
     finish: '/caseMissions/endMission',
     cancle: '/caseMissions/cancelMission',
   },
+  casePatientStatus: '/casePatientStatus',
   drugs: '/drugs',
   drugCategories: '/drugCategories',
   patients: '/patients',
