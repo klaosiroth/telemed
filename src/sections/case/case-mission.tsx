@@ -74,7 +74,7 @@ const CaseMission = () => {
         prefixModal: CASE_MISION.ARRIVE,
         dateArriveIncident: new Date(),
       };
-      await axiosInstance.post(API_ENDPOINTS.caseMissions.arrive, { caseMissionData });
+      await axiosInstance.post(API_ENDPOINTS.caseMissions.arrive, caseMissionData);
       toggleModal1();
       console.log('Modal 1 submitted:', caseMissionData);
     } catch (error) {
@@ -89,7 +89,7 @@ const CaseMission = () => {
         prefixModal: CASE_MISION.LEAVE,
         dateArriveIncident: new Date(),
       };
-      await axiosInstance.post(API_ENDPOINTS.caseMissions.leave, { caseMissionData });
+      await axiosInstance.post(API_ENDPOINTS.caseMissions.leave, caseMissionData);
       toggleModal2();
       console.log('Modal 2 submitted:', caseMissionData);
     } catch (error) {
@@ -104,7 +104,7 @@ const CaseMission = () => {
         prefixModal: CASE_MISION.HOSPITAL,
         dateArriveIncident: new Date(),
       };
-      await axiosInstance.post(API_ENDPOINTS.caseMissions.hospital, { caseMissionData });
+      await axiosInstance.post(API_ENDPOINTS.caseMissions.hospital, caseMissionData);
       toggleModal3();
       console.log('Modal 3 submitted:', caseMissionData);
     } catch (error) {
