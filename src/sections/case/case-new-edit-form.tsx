@@ -202,7 +202,7 @@ export default function CaseNewEditForm({ currentData }: Props) {
         title="ยืนยันการเปิดภารกิจ ช่วยเหลือผู้ป่วย"
         content={
           <>
-            เริ่มออกปฏิบัติการ <strong>วันที่ 29/09/2566 เวลา 20.00 น.</strong>
+            เริ่มออกปฏิบัติการ <strong>{getCurrentDateTimeString()}</strong>
           </>
         }
         action={
@@ -214,3 +214,12 @@ export default function CaseNewEditForm({ currentData }: Props) {
     </>
   );
 }
+
+const getCurrentDateTimeString = () => {
+  const now = new Date();
+  const formattedDate = `${now.getDate()}/${now.getMonth() + 1}/${now.getFullYear() + 543}`;
+  const hours = now.getHours();
+  const minutes = now.getMinutes() < 10 ? `0${now.getMinutes()}` : now.getMinutes();
+  const formattedTime = `${hours}.${minutes} น.`;
+  return `วันที่ ${formattedDate} เวลา ${formattedTime}`;
+};
