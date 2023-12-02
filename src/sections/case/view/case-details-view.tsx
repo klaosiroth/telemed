@@ -10,8 +10,9 @@ import CaseDetailsDispenser from '../case-details-dispenser';
 import CaseLocationTracker from '../case-location-tracker';
 import VideoPlayer from '../case-video-player';
 import Chat from '../chat';
-import styles from '../case-mission.module.css';
+import CasePatient from '../case-patient';
 import CasePatientStatus from '../case-patient-status';
+import styles from '../case-mission.module.css';
 
 const TABS = [
   { value: 'map', label: 'แผนที่' },
@@ -37,7 +38,7 @@ export default function CaseDetailsView() {
               ))}
             </Tabs>
             {currentTab === 'map' && <CaseLocationTracker />}
-            {currentTab === 'info' && <>ข้อมูลผู้ป่วย</>}
+            {currentTab === 'info' && <CasePatient />}
           </div>
           <CasePatientStatus />
         </section>

@@ -13,7 +13,7 @@ import { DatePicker } from '@mui/x-date-pickers/DatePicker';
 // utils
 import { PREFIX_OPTIONS } from 'src/constants';
 // types
-import { ICase } from 'src/types/case';
+import { TCase } from 'src/types/case';
 // components
 import FormProvider, { RHFSelect, RHFTextField } from 'src/components/hook-form';
 import axiosInstance, { API_ENDPOINTS } from 'src/utils/axios';
@@ -21,15 +21,15 @@ import axiosInstance, { API_ENDPOINTS } from 'src/utils/axios';
 type Props = {
   open: boolean;
   onClose: VoidFunction;
-  currentData?: ICase;
-  paramId?: string;
+  currentData?: TCase;
+  caseId?: string;
   updateData: (newData: FormValuesProps) => void;
 };
 
-type FormValuesProps = ICase;
+type FormValuesProps = TCase;
 
 export default function CaseQuickEditForm({
-  paramId,
+  caseId,
   currentData,
   open,
   onClose,
@@ -66,7 +66,7 @@ export default function CaseQuickEditForm({
   const onSubmit = useCallback(
     async (data: FormValuesProps) => {
       try {
-        await axiosInstance.patch(`${API_ENDPOINTS.cases}/${paramId}`, data);
+        await axiosInstance.patch(`${API_ENDPOINTS.cases}/${caseId}`, data);
         onClose();
         // Call the callback function to update the data in the parent component
         updateData(data);
@@ -75,7 +75,7 @@ export default function CaseQuickEditForm({
         console.error(error);
       }
     },
-    [onClose, paramId, updateData]
+    [onClose, caseId, updateData]
   );
 
   return (

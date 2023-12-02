@@ -6,7 +6,7 @@ import Typography from '@mui/material/Typography';
 // components
 import { useSettingsContext } from 'src/components/settings';
 //
-import CaseAmbulanceSelector from '../case-ambulance-selector';
+import CaseNewEditForm from '../case-new-edit-form';
 
 // ----------------------------------------------------------------------
 
@@ -19,7 +19,7 @@ export default function CaseCreateView() {
         เริ่มภารกิจ
       </Typography>
 
-      <CaseAmbulanceSelector />
+      <CaseNewEditForm />
     </Container>
   );
 }

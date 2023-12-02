@@ -1,4 +1,4 @@
-export type ICase = {
+export type TCase = {
   caseNo?: string;
   prefixModal: number;
   firstname?: string;
