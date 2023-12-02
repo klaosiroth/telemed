@@ -25,7 +25,7 @@ export default function CaseDetailsDispenser() {
     fetchData();
   }, [caseId]);
 
-  console.log('data', data);
+  if (!data) return <p>No data</p>;
 
   return (
     <>
@@ -43,15 +43,14 @@ export default function CaseDetailsDispenser() {
           {!isLoading && data?.length === 0 && <p>ไม่มีรายการจ่ายยา</p>}
           <Stack spacing={0.5}>
             <Typography variant="body2">
-              คลอร์เฟนิรามีนมาลีเอต (chlorpheniramine maleate) - 10 มิลลิกรัม
+              {data.drug.drugName} - {data.dosage}
             </Typography>
-            <Typography variant="body2">แวเลียม (Valium) - 5 มิลลิกรัม</Typography>
           </Stack>
         </Box>
       </Card>
 
       <CaseDetailsDispenserForm
-        currentData={data}
+        // currentData={data}
         open={quickEdit.value}
         onClose={quickEdit.onFalse}
       />

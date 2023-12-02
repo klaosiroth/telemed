@@ -1,7 +1,9 @@
 import * as Yup from 'yup';
 import { yupResolver } from '@hookform/resolvers/yup';
-import { useCallback, useMemo } from 'react';
+import { useCallback, useEffect, useState } from 'react';
 import { useForm } from 'react-hook-form';
+import { useParams } from 'src/routes/hook';
+
 import Stack from '@mui/material/Stack';
 import Button from '@mui/material/Button';
 import Dialog from '@mui/material/Dialog';
@@ -11,17 +13,7 @@ import DialogContent from '@mui/material/DialogContent';
 import LoadingButton from '@mui/lab/LoadingButton';
 
 import FormProvider, { RHFAutocomplete, RHFTextField } from 'src/components/hook-form';
-
-const OPTIONS = [
-  { value: 'option 1', label: 'Option 1' },
-  { value: 'option 2', label: 'Option 2' },
-  { value: 'option 3', label: 'Option 3' },
-  { value: 'option 4', label: 'Option 4' },
-  { value: 'option 5', label: 'Option 5' },
-  { value: 'option 6', label: 'Option 6' },
-  { value: 'option 7', label: 'Option 7' },
-  { value: 'option 8', label: 'Option 8' },
-];
+import axiosInstance, { API_ENDPOINTS } from 'src/utils/axios';
 
 type OptionType = {
   value: string;
@@ -31,28 +23,40 @@ type OptionType = {
 type Props = {
   open: boolean;
   onClose: VoidFunction;
-  currentData?: any;
 };
 
-type FormValuesProps = any;
+type FormValuesProps = {
+  drugOptions: any;
+  caseId: string;
+  drugId: string;
+  dosage: string;
+};
 
-export default function CaseDetailsDispenserForm({ currentData, open, onClose }: Props) {
-  const Schema = Yup.object().shape({
-    // Define validation schema
-  });
+const FormSchema = Yup.object().shape({
+  drugOptions: Yup.mixed().required('จำเป็นต้องเลือกรายการยา'),
+  dosage: Yup.string().required('กรุณาระบุปริมาณยา'),
+});
 
-  const defaultValues = useMemo(
-    () => ({
-      drugId: currentData?.drugId || '',
-      dosage: currentData?.dosage || '',
-    }),
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-    [currentData]
-  );
+export default function CaseDetailsDispenserForm({ open, onClose }: Props) {
+  const params = useParams();
+  const { id: caseId } = params;
+
+  const [drugOptions, setDrugOptions] = useState<OptionType[]>([]);
+
+  useEffect(() => {
+    const fetchData = async () => {
+      const res = await axiosInstance.get(API_ENDPOINTS.drugs);
+      const options = res.data.map((item: any) => ({ value: item.drugId, label: item.drugName }));
+      setDrugOptions(options);
+    };
+    fetchData();
+  }, []);
 
   const methods = useForm<FormValuesProps>({
-    resolver: yupResolver(Schema),
-    defaultValues,
+    resolver: yupResolver(FormSchema),
+    defaultValues: {
+      dosage: '',
+    },
   });
 
   const {
@@ -64,7 +68,9 @@ export default function CaseDetailsDispenserForm({ currentData, open, onClose }:
   const onSubmit = useCallback(
     async (data: FormValuesProps) => {
       try {
-        await new Promise((resolve) => setTimeout(resolve, 500));
+        data.caseId = caseId;
+        data.drugId = data.drugOptions.value;
+        await axiosInstance.post(`${API_ENDPOINTS.caseDrugs}/${caseId}`, data);
         reset();
         onClose();
         console.info('DATA', data);
@@ -72,8 +78,10 @@ export default function CaseDetailsDispenserForm({ currentData, open, onClose }:
         console.error(error);
       }
     },
-    [onClose, reset]
+    [caseId, onClose, reset]
   );
+
+  if (!drugOptions) return <p>No data</p>;
 
   return (
     <Dialog
@@ -91,23 +99,13 @@ export default function CaseDetailsDispenserForm({ currentData, open, onClose }:
         <DialogContent>
           <Stack spacing={2} mt={1}>
             <RHFAutocomplete
-              name="autocomplete"
-              label="กลุ่มยา"
-              options={OPTIONS}
-              getOptionLabel={(option: OptionType | string) => (option as OptionType).label}
-              isOptionEqualToValue={(option, value) => option.value === value.value}
-              renderOption={(props, option) => (
-                <li {...props} key={option.value}>
-                  {option.label}
-                </li>
-              )}
-            />
-            <RHFAutocomplete
-              name="autocomplete"
+              name="drugOptions"
               label="ยา"
-              options={OPTIONS}
+              options={drugOptions}
               getOptionLabel={(option: OptionType | string) => (option as OptionType).label}
               isOptionEqualToValue={(option, value) => option.value === value.value}
+              // value={methods.getValues('drugOptions')} // Use getValues to get the value from react-hook-form
+              // onChange={(_, newValue) => methods.setValue('drugOptions', newValue)} // Set the value using setValue
               renderOption={(props, option) => (
                 <li {...props} key={option.value}>
                   {option.label}
