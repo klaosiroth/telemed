@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useCallback, useEffect, useState } from 'react';
 import { Box, Card, CardHeader, IconButton, Stack, Typography } from '@mui/material';
 import { useBoolean } from 'src/hooks/use-boolean';
 import { useParams } from 'src/routes/hook';
@@ -15,17 +15,23 @@ export default function CaseDetailsDispenser() {
   const [data, setData] = useState<any | null>(null);
   const [isLoading, setIsLoading] = useState(false);
 
-  useEffect(() => {
-    const fetchData = async () => {
-      setIsLoading(true);
+  const fetchData = useCallback(async () => {
+    setIsLoading(true);
+    try {
       const res = await axiosInstance.get(`${API_ENDPOINTS.caseDrugs}/${caseId}`);
       setData(res.data);
+    } catch (error) {
+      console.error(error);
+    } finally {
       setIsLoading(false);
-    };
-    fetchData();
+    }
   }, [caseId]);
 
-  if (!data) return <p>No data</p>;
+  useEffect(() => {
+    fetchData();
+  }, [fetchData]);
+
+  if (isLoading) return <p>Loading...</p>;
 
   return (
     <>
@@ -41,11 +47,13 @@ export default function CaseDetailsDispenser() {
         />
         <Box sx={{ px: 3 }}>
           {!isLoading && data?.length === 0 && <p>ไม่มีรายการจ่ายยา</p>}
-          <Stack spacing={0.5}>
-            <Typography variant="body2">
-              {data.drug.drugName} - {data.dosage}
-            </Typography>
-          </Stack>
+          {data ? (
+            <Stack spacing={0.5}>
+              <Typography variant="body2">
+                {data.drug.drugName} - {data.dosage}
+              </Typography>
+            </Stack>
+          ) : null}
         </Box>
       </Card>
 
@@ -53,6 +61,7 @@ export default function CaseDetailsDispenser() {
         // currentData={data}
         open={quickEdit.value}
         onClose={quickEdit.onFalse}
+        onComplete={fetchData}
       />
     </>
   );

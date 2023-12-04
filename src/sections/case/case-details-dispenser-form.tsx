@@ -23,6 +23,7 @@ type OptionType = {
 type Props = {
   open: boolean;
   onClose: VoidFunction;
+  onComplete: () => void;
 };
 
 type FormValuesProps = {
@@ -37,7 +38,7 @@ const FormSchema = Yup.object().shape({
   dosage: Yup.string().required('กรุณาระบุปริมาณยา'),
 });
 
-export default function CaseDetailsDispenserForm({ open, onClose }: Props) {
+export default function CaseDetailsDispenserForm({ open, onClose, onComplete }: Props) {
   const params = useParams();
   const { id: caseId } = params;
 
@@ -68,17 +69,21 @@ export default function CaseDetailsDispenserForm({ open, onClose }: Props) {
   const onSubmit = useCallback(
     async (data: FormValuesProps) => {
       try {
-        data.caseId = caseId;
-        data.drugId = data.drugOptions.value;
-        await axiosInstance.post(`${API_ENDPOINTS.caseDrugs}/${caseId}`, data);
+        const formData = {
+          caseId,
+          drugId: data.drugOptions.value,
+          dosage: data.dosage,
+        };
+        await axiosInstance.post(API_ENDPOINTS.caseDrugs, formData);
         reset();
         onClose();
-        console.info('DATA', data);
+        onComplete();
+        console.info('DATA', formData);
       } catch (error) {
         console.error(error);
       }
     },
-    [caseId, onClose, reset]
+    [caseId, onClose, onComplete, reset]
   );
 
   if (!drugOptions) return <p>No data</p>;
