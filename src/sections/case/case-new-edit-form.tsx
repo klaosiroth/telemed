@@ -77,15 +77,25 @@ export default function CaseNewEditForm({ currentData }: Props) {
       try {
         const response = await axiosInstance.post(API_ENDPOINTS.cases, data);
         const newCaseId = response.data.caseId;
-        const caseMissionData = {
+        await axiosInstance.post(API_ENDPOINTS.caseMissions.start, {
           caseId: newCaseId,
-          // * Set default values for new case mission
-          // prefixModal: 1,
-          // dateStartMission: new Date(),
-        };
-        await axiosInstance.post(API_ENDPOINTS.caseMissions.start, { caseMissionData });
+        });
+        await axiosInstance.post(API_ENDPOINTS.casePatientStatus, {
+          caseId: newCaseId,
+          pulseValue: '-',
+          pulseRateValue: '-',
+          bloodPressureRateValue: '-',
+          respiratoryValue: '-',
+          bloodPressureValue: '-',
+          planScoreValue: '-',
+          nauroValue: '-',
+          gcsValue: '-',
+          dtxValue: '-',
+          pupilsValue: '-',
+          ariValue: '-',
+        });
         router.push(paths.dashboard.case.details(newCaseId));
-        console.info('Form submitted:', data, caseMissionData);
+        console.info('Form submitted:', data);
       } catch (error) {
         console.error('Error submitting form:', error);
       }
