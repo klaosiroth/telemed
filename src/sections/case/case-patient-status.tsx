@@ -291,7 +291,7 @@ export default function CasePatientStatus() {
 type FormProps = {
   open: boolean;
   onClose: VoidFunction;
-  data?: string;
+  data: string;
   isEditing: boolean;
   fieldName: string;
   options?: any[];
@@ -328,7 +328,7 @@ export function CasePatientStatusForm({
           await axiosInstance.patch(`${API_ENDPOINTS.casePatientStatus}/${caseId}`, formValues);
         } else {
           // Create new data
-          await axiosInstance.post(`${API_ENDPOINTS.casePatientStatus}/${caseId}`, formValues);
+          await axiosInstance.post(API_ENDPOINTS.casePatientStatus, formValues);
         }
         reset();
         onClose();
