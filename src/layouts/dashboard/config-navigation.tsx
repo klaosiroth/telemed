@@ -67,6 +67,11 @@ export function useNavData() {
             icon: ICONS.menuItem,
           },
           {
+            title: 'รถปฏิบัติภารกิจ',
+            path: paths.dashboard.caseAdmin.root,
+            icon: ICONS.menuItem,
+          },
+          {
             title: 'ข้อมูลรถพยาบาล',
             path: paths.dashboard.ambulance.root,
             icon: ICONS.menuItem,
