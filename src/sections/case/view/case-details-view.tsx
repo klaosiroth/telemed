@@ -6,7 +6,7 @@ import Tabs from '@mui/material/Tabs';
 import Container from '@mui/material/Container';
 //
 import CaseMission from '../case-mission';
-import CaseDetailsDispenser from '../case-details-dispenser';
+import CaseDispenser from '../case-dispenser';
 import CaseLocationTracker from '../case-location-tracker';
 import VideoPlayer from '../case-video-player';
 import Chat from '../chat';
@@ -49,7 +49,7 @@ export default function CaseDetailsView() {
           <Chat />
         </aside>
         <section className={styles.note}>
-          <CaseDetailsDispenser />
+          <CaseDispenser />
         </section>
       </div>
     </Container>
