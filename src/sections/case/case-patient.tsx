@@ -41,7 +41,7 @@ export default function CasePatient() {
           title="ข้อมูลผู้ป่วย"
           action={
             <IconButton color={quickEdit.value ? 'inherit' : 'default'} onClick={quickEdit.onTrue}>
-              <Iconify icon="solar:pen-bold" />
+              <Iconify icon="solar:pen-bold" width={18} />
             </IconButton>
           }
         />
