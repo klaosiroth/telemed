@@ -77,6 +77,7 @@ const CaseMission = () => {
       await axiosInstance.post(API_ENDPOINTS.caseMissions.arrive, caseMissionData);
       toggleModal1();
       console.log('Modal 1 submitted:', caseMissionData);
+      // Trigger update on the admin side
     } catch (error) {
       console.error(error);
     }
@@ -87,7 +88,7 @@ const CaseMission = () => {
       const caseMissionData = {
         caseId: id,
         prefixModal: CASE_MISION.LEAVE,
-        dateArriveIncident: new Date(),
+        dateLeavingScene: new Date(),
       };
       await axiosInstance.post(API_ENDPOINTS.caseMissions.leave, caseMissionData);
       toggleModal2();
@@ -102,7 +103,7 @@ const CaseMission = () => {
       const caseMissionData = {
         caseId: id,
         prefixModal: CASE_MISION.HOSPITAL,
-        dateArriveIncident: new Date(),
+        dateArriveHospital: new Date(),
       };
       await axiosInstance.post(API_ENDPOINTS.caseMissions.hospital, caseMissionData);
       toggleModal3();
@@ -115,7 +116,11 @@ const CaseMission = () => {
   const handleConfirm4Action = async () => {
     try {
       const timestamp = new Date().toISOString();
-      await new Promise((resolve) => setTimeout(resolve, 500));
+      await axiosInstance.post(API_ENDPOINTS.caseMissions.hospital, {
+        caseId: id,
+        prefixModal: CASE_MISION.FINISH,
+        dateEndMission: new Date(),
+      });
       toggleModal4();
       console.log('Modal 4 submitted:', timestamp);
     } catch (error) {
