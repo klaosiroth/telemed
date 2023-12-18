@@ -8,18 +8,20 @@ import axiosInstance, { API_ENDPOINTS } from 'src/utils/axios';
 interface Ambulance {
   ambulanceId: number;
   isActive: boolean;
+  isMission: boolean;
   ambulanceName: string;
   licensePlate: string;
 }
 
 export default function CaseAdminAmbulanceList() {
   const router = useRouter();
-  const [data, setData] = useState<Ambulance[] | null>(null);
+  const [ambulances, setAmbulances] = useState<Ambulance[] | null>(null);
 
   const fetchData = useCallback(async () => {
     try {
       const response = await axiosInstance.get<Ambulance[]>(API_ENDPOINTS.ambulances);
-      setData(response.data);
+      const ambulanceData = response.data.filter((ambulance: Ambulance) => ambulance.isActive);
+      setAmbulances(ambulanceData);
     } catch (error) {
       console.error(error);
     }
@@ -29,18 +31,19 @@ export default function CaseAdminAmbulanceList() {
     fetchData();
   }, [fetchData]);
 
-  const handleClick = (ambulance: Ambulance) => {
-    if (!ambulance.isActive) {
-      // Vehicle is not ready for use, do nothing
-      return;
-    }
+  const handleClick = useCallback(
+    (ambulance: Ambulance) => {
+      if (!ambulance.isActive) {
+        // Vehicle is not ready for use, do nothing
+        return;
+      }
+      router.push(paths.dashboard.caseAdmin.details('16a2c786-d4f4-4951-be41-9cb6ce0762e0'));
+    },
+    [router]
+  );
 
-    router.push(paths.dashboard.caseAdmin.details('16a2c786-d4f4-4951-be41-9cb6ce0762e0'));
-  };
-
-  console.log('data', data);
-
-  if (!data) return <p>No data</p>;
+  if (!ambulances) return null; // or render a loading state
+  console.log('ambulances', ambulances);
 
   return (
     <Box
@@ -52,11 +55,11 @@ export default function CaseAdminAmbulanceList() {
         md: 'repeat(3, 1fr)',
       }}
     >
-      {data.map((ambulance: Ambulance) => (
+      {ambulances.map((ambulance: Ambulance) => (
         <Card
           key={ambulance.ambulanceId}
-          style={{ cursor: ambulance.isActive ? 'pointer' : 'not-allowed' }}
-          onClick={() => handleClick(ambulance)}
+          style={{ cursor: ambulance.isMission ? 'pointer' : 'not-allowed' }}
+          onClick={() => ambulance.isMission && handleClick(ambulance)}
         >
           <img
             src="https://cf.autodeft2.pw/uploads/images/ablvan1.jpg"
@@ -64,8 +67,8 @@ export default function CaseAdminAmbulanceList() {
             style={{ width: '100%', height: '200px', objectFit: 'cover' }}
           />
           <CardContent>
-            <Label variant="soft" color={ambulance.isActive ? 'success' : 'error'}>
-              {ambulance.isActive ? 'พร้อมใช้งาน' : 'ไม่พร้อมใช้งาน'}
+            <Label variant="soft" color={ambulance.isMission ? 'success' : 'error'}>
+              {ambulance.isMission ? 'กำลังปฎิบัติภารกิจ' : 'ไม่ได้ปฎิบัติภารกิจ'}
             </Label>
             <Typography variant="h6">{ambulance.ambulanceName}</Typography>
             <Typography variant="body2">ทะเบียนรถ: {ambulance.licensePlate}</Typography>
