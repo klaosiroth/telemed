@@ -9,6 +9,7 @@ import { useBoolean } from 'src/hooks/use-boolean';
 // types
 import { DrugCategory } from 'src/types/drug';
 // components
+import { fDate } from 'src/utils/format-time';
 import Iconify from 'src/components/iconify';
 import { ConfirmDialog } from 'src/components/custom-dialog';
 import CustomPopover, { usePopover } from 'src/components/custom-popover';
@@ -25,6 +26,7 @@ type Props = {
 export default function DrugCategoryTableRow({ index, row, onEditRow, onDeleteRow }: Props) {
   const confirm = useBoolean();
   const popover = usePopover();
+  const formattedDate = fDate(row.createdAt, 'dd/MM/yyyy');
 
   return (
     <>
@@ -32,7 +34,7 @@ export default function DrugCategoryTableRow({ index, row, onEditRow, onDeleteRo
         <TableCell>{index + 1}</TableCell>
         <TableCell>{row.drugCategoryName}</TableCell>
         <TableCell>This is an example category&apos;s drug with some details.</TableCell>
-        <TableCell>createdAt</TableCell>
+        <TableCell>{formattedDate}</TableCell>
         <TableCell align="right">
           <IconButton color={popover.open ? 'primary' : 'default'} onClick={popover.onOpen}>
             <Iconify icon="eva:more-vertical-fill" />
