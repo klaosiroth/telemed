@@ -33,11 +33,11 @@ export default function CaseAdminMission() {
 
   const renderCard = (title: string, date: string, formatter: (date: Date) => string) => (
     <Card className={styles.menuItem} sx={{ borderRadius: 1 }} variant="outlined">
-      <Typography variant="subtitle2">
-        {title}: {data ? formatter(new Date(date)) : '-'}
-      </Typography>
+      <Typography variant="subtitle2">{`${title}: ${formatter(new Date(date))}`}</Typography>
     </Card>
   );
+
+  console.log('data', data);
 
   return (
     <section className={styles.menu}>
@@ -50,7 +50,8 @@ export default function CaseAdminMission() {
 }
 
 function formatTime(date: Date): string {
-  return `${new Intl.DateTimeFormat('th-TH', {
-    timeStyle: 'short',
-  }).format(date)} น.`;
+  const dateObject = typeof date === 'string' ? new Date(date) : date;
+  return dateObject && !Number.isNaN(dateObject.getTime())
+    ? `${new Intl.DateTimeFormat('th-TH', { timeStyle: 'short' }).format(dateObject)} น.`
+    : '-';
 }

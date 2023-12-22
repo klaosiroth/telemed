@@ -5,7 +5,6 @@ import { useBoolean } from 'src/hooks/use-boolean';
 
 import Card from '@mui/material/Card';
 import Typography from '@mui/material/Typography';
-
 import Stack from '@mui/material/Stack';
 import Button from '@mui/material/Button';
 import Divider from '@mui/material/Divider';
@@ -15,58 +14,19 @@ import DialogTitle from '@mui/material/DialogTitle';
 import DialogActions from '@mui/material/DialogActions';
 import DialogContent from '@mui/material/DialogContent';
 
+import { socket } from 'src/utils/socket';
 import axiosInstance, { API_ENDPOINTS } from 'src/utils/axios';
 import FormProvider, { RHFSelect, RHFTextField } from 'src/components/hook-form';
+import {
+  ARI_OPTIONS,
+  EYE_OPENING_OPTIONS,
+  MOTOR_RESPONSE_OPTIONS,
+  PAIN_SCORE_OPTIONS,
+  PUPILS_OPTIONS,
+  VERBAL_RESPONSE_OPTIONS,
+} from 'src/constants';
 
 import styles from './case-mission.module.css';
-
-const PAIN_SCORE_OPTIONS = [
-  { value: 'ผู้ป่วยวิกฤต', label: 'ผู้ป่วยวิกฤต' },
-  { value: 'ผู้ป่วยฉุกเฉิน', label: 'ผู้ป่วยฉุกเฉิน' },
-  { value: 'ผู้ป่วยรีบด่วน', label: 'ผู้ป่วยรีบด่วน' },
-  { value: 'ผู้ป่วยกึ่งรีบด่วน', label: 'ผู้ป่วยกึ่งรีบด่วน' },
-  { value: 'ผู้ป่วยไม่รีบด่วน', label: 'ผู้ป่วยไม่รีบด่วน' },
-];
-
-const PUPILS_OPTIONS = [
-  { value: 'Reaction', label: 'Reaction' },
-  { value: 'Sluggish', label: 'Sluggish' },
-  { value: 'No Reaction', label: 'No Reaction' },
-  { value: 'Close', label: 'Close' },
-];
-
-const ARI_OPTIONS = [
-  { value: 'มีไข้', label: 'มีไข้' },
-  { value: 'ไอ จาม', label: 'ไอ จาม' },
-  { value: 'เจ็บคอ', label: 'เจ็บคอ' },
-  { value: 'คัดจมูก', label: 'คัดจมูก' },
-  { value: 'มีน้ำมูก', label: 'มีน้ำมูก' },
-  { value: 'มีเสมหะ', label: 'มีเสมหะ' },
-];
-
-// const E_OPTIONS = [
-//   { value: 'E1', label: 'ไม่ลืมตา ไม่ตอบสนองต่อสิ่งกระตุ้นใดๆ' },
-//   { value: 'E2', label: 'ลืมตาเมื่อเจ็บ' },
-//   { value: 'E3', label: 'ลืมตาเมื่อเรียก' },
-//   { value: 'E4', label: 'ลืมตาได้เอง' },
-// ];
-
-// const M_OPTIONS = [
-//   { value: 'M1', label: 'ไม่มีการเคลื่อนไหวใดๆต่อสิ่งกระตุ้น ไม่ตอบสนองต่อความเจ็บปวด' },
-//   { value: 'M2', label: 'ตอบสนองต่อการกระตุ้นที่ทำให้เจ็บ โดย แขน ขาเหยียดเกร็ง' },
-//   { value: 'M3', label: 'ตอบสนองต่อการกระตุ้นที่ทำให้เจ็บ โดย แขน ขางอเข้าผิดปกติ' },
-//   { value: 'M4', label: 'ตอบสนองต่อการทำให้เจ็บแบบปกติ เช่น เคลื่อนแขนขาหนี' },
-//   { value: 'M5', label: 'ตอบสนองต่อการทำให้เจ็บ ถูกตำแหน่งที่ทำให้เจ็บ เช่น การปัดสิ่งกระตุ้น' },
-//   { value: 'M6', label: 'เคลื่อนไหวได้ตามคำสั่งถูกต้อง' },
-// ];
-
-// const V_OPTIONS = [
-//   { value: 'V1', label: 'ไม่พูด ไม่ส่งเสียงใดๆ' },
-//   { value: 'V2', label: 'ส่งเสียงอือ อา ไม่เป็นคำพูด' },
-//   { value: 'V3', label: 'ส่งเสียงพูดเป็นคำๆ แต่ฟังไม่รู้เรื่อง' },
-//   { value: 'V4', label: 'พูดเป็นคำๆ แต่ไม่ถูกต้องกับเหตุการณ์' },
-//   { value: 'V5', label: 'ถามตอบรู้เรื่องปกติ' },
-// ];
 
 type PatientStatus = {
   caseId: string;
@@ -75,6 +35,7 @@ type PatientStatus = {
   bloodPressureRateValue: string;
   respiratoryValue: string;
   bloodPressureValue: string;
+  bodyTemperatureValue: string;
   planScoreValue: string;
   nauroValue: string;
   gcsValue: string;
@@ -95,6 +56,7 @@ export default function CasePatientStatus() {
     pulseRate: useBoolean(),
     bloodPressure: useBoolean(),
     bloodPressureRate: useBoolean(),
+    bodyTemperature: useBoolean(),
     respiratory: useBoolean(),
     planScore: useBoolean(),
     nauro: useBoolean(),
@@ -109,7 +71,7 @@ export default function CasePatientStatus() {
     setIsLoading(true);
     try {
       const res = await axiosInstance.get(`${API_ENDPOINTS.casePatientStatus}/${caseId}`);
-      setData(res.data);
+      setData(res.data.casePatientStatus);
     } catch (error) {
       console.error(error);
     } finally {
@@ -118,13 +80,41 @@ export default function CasePatientStatus() {
   }, [caseId]);
 
   useEffect(() => {
+    // Establish the socket connection
+    socket.connect();
+
+    // Listen for the 'pulse' event
+    socket.on('status', (message) => {
+      console.log('socket pulseValue', message);
+
+      // Update the data in real-time
+      fetchData();
+      // setData((prevData) => ({
+      //   ...prevData,
+      //   pulseValue: message.value,
+      // }));
+      // setData((prevData) => ({
+      //   caseId: prevData?.caseId || 'defaultCaseId',
+      //   pulseRateValue: prevData?.pulseRateValue || 'defaultPulseRateValue',
+      //   bloodPressureRateValue: prevData?.bloodPressureRateValue || 'defaultBloodPressureRateValue',
+      //   // ... add default values for all other properties ...
+      //   pulseValue: message.value,
+      // }));
+    });
     fetchData();
+
+    return () => {
+      // Disconnect the socket when the component is unmounted
+      socket.disconnect();
+    };
   }, [fetchData]);
 
   const isEditing = !!data; // Check if data is present to determine if it's an edit operation
 
   if (isLoading) return <p>Loading...</p>;
   if (!data) return <p>No data</p>;
+
+  console.log('data', data);
 
   return (
     <>
@@ -152,9 +142,9 @@ export default function CasePatientStatus() {
             <Typography variant="subtitle2">Blood pressure</Typography>
             <Typography variant="body2">{data.bloodPressureValue}</Typography>
           </Card>
-          <Card className={styles.statusBlock}>
+          <Card className={styles.statusBlock} onClick={quickForms.bodyTemperature.onTrue}>
             <Typography variant="subtitle2">Body Temperature</Typography>
-            <Typography variant="body2">ขาดฟิลด์</Typography>
+            <Typography variant="body2">{data.bodyTemperatureValue}</Typography>
           </Card>
           <Card className={styles.statusBlock} onClick={quickForms.planScore.onTrue}>
             <Typography variant="subtitle2">Plan score</Typography>
@@ -220,6 +210,15 @@ export default function CasePatientStatus() {
       />
 
       <CasePatientStatusForm
+        open={quickForms.bodyTemperature.value}
+        onClose={quickForms.bodyTemperature.onFalse}
+        data={data.bodyTemperatureValue}
+        fieldName="bodyTemperatureValue"
+        isEditing={isEditing}
+        onComplete={fetchData}
+      />
+
+      <CasePatientStatusForm
         open={quickForms.respiratory.value}
         onClose={quickForms.respiratory.onFalse}
         data={data.respiratoryValue}
@@ -246,7 +245,18 @@ export default function CasePatientStatus() {
         onComplete={fetchData}
       />
 
-      <CasePatientStatusForm
+      {/* <CasePatientStatusForm
+        open={quickForms.gcs.value}
+        onClose={quickForms.gcs.onFalse}
+        data={data.gcsValue}
+        fieldName="gcsValue"
+        isEditing={isEditing}
+        onComplete={fetchData}
+        options={PAIN_SCORE_OPTIONS}
+        options={PAIN_SCORE_OPTIONS}
+        options={PAIN_SCORE_OPTIONS}
+      /> */}
+      <CasePatientGCSForm
         open={quickForms.gcs.value}
         onClose={quickForms.gcs.onFalse}
         data={data.gcsValue}
@@ -292,9 +302,12 @@ type FormProps = {
   open: boolean;
   onClose: VoidFunction;
   data: string;
-  isEditing: boolean;
+  isEditing?: boolean;
   fieldName: string;
   options?: any[];
+  optionsE?: any[];
+  optionsM?: any[];
+  optionsV?: any[];
   onComplete: () => void;
 };
 
@@ -307,6 +320,9 @@ export function CasePatientStatusForm({
   isEditing,
   fieldName,
   options,
+  optionsE,
+  optionsM,
+  optionsV,
   onComplete,
 }: FormProps) {
   const params = useParams();
@@ -334,6 +350,21 @@ export function CasePatientStatusForm({
         onClose();
         console.info('DATA', formValues);
 
+        const [keys] = Object.keys(formValues);
+        const [values] = Object.values(formValues);
+
+        const eventName = keys.replace('Value', '').toLowerCase();
+        const message = {
+          value: values,
+          caseId,
+        };
+
+        console.log('eventName', eventName);
+
+        // Emit socket event to server
+        // socket.emit(eventName, { data: message });
+        socket.emit('status', message);
+
         // Refetch data after successful submission
         onComplete();
       } catch (error) {
@@ -342,6 +373,70 @@ export function CasePatientStatusForm({
     },
     [caseId, isEditing, onClose, onComplete, reset]
   );
+
+  const renderGCSForm = () => (
+    <>
+      <RHFSelect name="eyeOpeningValue" label="Eye Opening">
+        {EYE_OPENING_OPTIONS.map((option) => (
+          <MenuItem key={option.value} value={option.value}>
+            {option.label}
+          </MenuItem>
+        ))}
+      </RHFSelect>
+
+      <RHFSelect name="motorResponseValue" label="Motor Response">
+        {MOTOR_RESPONSE_OPTIONS.map((option) => (
+          <MenuItem key={option.value} value={option.value}>
+            {option.label}
+          </MenuItem>
+        ))}
+      </RHFSelect>
+
+      <RHFSelect name="verbalResponseValue" label="Verbal Response">
+        {VERBAL_RESPONSE_OPTIONS.map((option) => (
+          <MenuItem key={option.value} value={option.value}>
+            {option.label}
+          </MenuItem>
+        ))}
+      </RHFSelect>
+    </>
+  );
+
+  const renderSelectForm = () => {
+    if (options === PAIN_SCORE_OPTIONS) {
+      return (
+        <RHFSelect name={fieldName} label={fieldName}>
+          {options.map((option) => (
+            <MenuItem key={option.value} value={option.value}>
+              {option.label}
+            </MenuItem>
+          ))}
+        </RHFSelect>
+      );
+    }
+    if (options === PUPILS_OPTIONS) {
+      return (
+        <RHFSelect name={fieldName} label={fieldName}>
+          {options.map((option) => (
+            <MenuItem key={option.value} value={option.value}>
+              {option.label}
+            </MenuItem>
+          ))}
+        </RHFSelect>
+      );
+    }
+    return null; // Add this line to fix the eslint error
+  };
+
+  const renderWithCondition = () => {
+    if (fieldName === 'gcsValue') {
+      return renderGCSForm();
+    }
+    if (options) {
+      return renderSelectForm();
+    }
+    return <RHFTextField name={fieldName} label={fieldName} />;
+  };
 
   return (
     <Dialog
@@ -370,6 +465,7 @@ export function CasePatientStatusForm({
             ) : (
               <RHFTextField name={fieldName} label={fieldName} />
             )}
+            {/* {renderWithCondition()} */}
           </Stack>
         </DialogContent>
         <DialogActions>
@@ -378,7 +474,93 @@ export function CasePatientStatusForm({
           </Button>
 
           <Button variant="contained" color="primary" type="submit">
-            {isEditing ? 'แก้ไข' : 'บันทึก'}
+            {isEditing ? 'อัปเดต' : 'บันทึก'}
+          </Button>
+        </DialogActions>
+      </FormProvider>
+    </Dialog>
+  );
+}
+
+function CasePatientGCSForm({ open, onClose, onComplete }: any) {
+  const params = useParams();
+  const { id: caseId } = params;
+
+  const defaultValues = useMemo(
+    () => ({
+      eyeOpeningValue: '',
+      motorResponseValue: '',
+      verbalResponseValue: '',
+    }),
+    []
+  );
+
+  const methods = useForm<any>({
+    defaultValues,
+  });
+
+  const { reset, handleSubmit } = methods;
+
+  const onSubmit = useCallback(
+    async (formValues: any) => {
+      try {
+        await axiosInstance.post(API_ENDPOINTS.casePatientStatus, formValues);
+        reset();
+        onClose();
+        onComplete();
+      } catch (error) {
+        console.error(error);
+      }
+    },
+    [onClose, onComplete, reset]
+  );
+
+  return (
+    <Dialog
+      open={open}
+      onClose={onClose}
+      fullWidth
+      maxWidth={false}
+      PaperProps={{
+        sx: { maxWidth: 360 },
+      }}
+    >
+      <FormProvider methods={methods} onSubmit={handleSubmit(onSubmit)}>
+        <DialogTitle>GCS</DialogTitle>
+        <DialogContent>
+          <Stack spacing={2} mt={1}>
+            <RHFSelect name="eyeOpeningValue" label="Eye Opening">
+              {EYE_OPENING_OPTIONS.map((option) => (
+                <MenuItem key={option.value} value={option.value}>
+                  {option.label}
+                </MenuItem>
+              ))}
+            </RHFSelect>
+
+            <RHFSelect name="motorResponseValue" label="Motor Response">
+              {MOTOR_RESPONSE_OPTIONS.map((option) => (
+                <MenuItem key={option.value} value={option.value}>
+                  {option.label}
+                </MenuItem>
+              ))}
+            </RHFSelect>
+
+            <RHFSelect name="verbalResponseValue" label="Verbal Response">
+              {VERBAL_RESPONSE_OPTIONS.map((option) => (
+                <MenuItem key={option.value} value={option.value}>
+                  {option.label}
+                </MenuItem>
+              ))}
+            </RHFSelect>
+          </Stack>
+        </DialogContent>
+        <DialogActions>
+          <Button variant="outlined" onClick={onClose}>
+            ยกเลิก
+          </Button>
+
+          <Button variant="contained" color="primary" type="submit">
+            บันทึก
           </Button>
         </DialogActions>
       </FormProvider>
