@@ -8,7 +8,7 @@ import Drawer from '@mui/material/Drawer';
 // hooks
 import { useResponsive } from 'src/hooks/use-responsive';
 // hooks
-import { useMockedUser } from 'src/hooks/use-mocked-user';
+import { useAuthContext } from 'src/auth/hooks';
 // components
 import Logo from 'src/components/logo';
 import Scrollbar from 'src/components/scrollbar';
@@ -27,7 +27,7 @@ type Props = {
 };
 
 export default function NavVertical({ openNav, onCloseNav }: Props) {
-  const { user } = useMockedUser();
+  const { user } = useAuthContext();
 
   const pathname = usePathname();
 
@@ -58,7 +58,7 @@ export default function NavVertical({ openNav, onCloseNav }: Props) {
       <NavSectionVertical
         data={navData}
         config={{
-          currentRole: user?.role || 'admin',
+          currentRole: user?.role.roleName || 'admin',
         }}
       />
 

@@ -51,8 +51,27 @@ export function useNavData() {
       {
         subheader: 'overview v1.0.0',
         items: [
-          { title: 'สรุป', path: paths.dashboard.root, icon: ICONS.dashboard },
+          {
+            title: 'สรุป',
+            path: paths.dashboard.root,
+            icon: ICONS.dashboard,
+            roles: ['admin'],
+          },
           // { title: 'analytics', path: paths.dashboard.three, icon: ICONS.analytics },
+        ],
+      },
+
+      // OPERATIONS
+      // ----------------------------------------------------------------------
+      {
+        subheader: 'operation',
+        items: [
+          {
+            title: 'ปฏิบัติภารกิจ',
+            path: paths.dashboard.case.new,
+            icon: ICONS.menuItem,
+            roles: ['user', 'ambulance'],
+          },
         ],
       },
 
@@ -62,34 +81,34 @@ export function useNavData() {
         subheader: 'management',
         items: [
           {
-            title: 'ปฏิบัติภารกิจ',
-            path: paths.dashboard.case.new,
-            icon: ICONS.menuItem,
-          },
-          {
-            title: 'รถปฏิบัติภารกิจ',
+            title: 'ข้อมูลปฏิบัติภารกิจ',
             path: paths.dashboard.caseAdmin.root,
             icon: ICONS.menuItem,
+            roles: ['admin'],
           },
           {
             title: 'ข้อมูลรถพยาบาล',
             path: paths.dashboard.ambulance.root,
             icon: ICONS.menuItem,
+            roles: ['admin'],
           },
           {
             title: 'ข้อมูลยา',
             path: paths.dashboard.drug.root,
             icon: ICONS.menuItem,
+            roles: ['admin'],
           },
           {
             title: 'ข้อมูลกลุ่มยา',
             path: paths.dashboard.drugCategory.root,
             icon: ICONS.menuItem,
+            roles: ['admin'],
           },
           {
             title: 'ข้อมูลผู้ป่วย',
             path: paths.dashboard.patient.root,
             icon: ICONS.menuItem,
+            roles: ['admin'],
           },
         ],
       },
