@@ -14,6 +14,7 @@ export type Drug = {
   isActive: boolean;
   drugCategory: DrugCategory;
   drugCategoryId: string;
+  createdAt: string;
 };
 
 export type CreateDrugDTO = {
@@ -28,6 +29,7 @@ export type DrugCategory = {
   drugCategoryName: string;
   drugs: Drug;
   isActive: boolean;
+  createdAt: string;
 };
 
 export type CreateDrugCategoryDTO = {
