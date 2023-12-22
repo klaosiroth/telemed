@@ -5,12 +5,17 @@ import { useRouter } from 'src/routes/hook';
 import Label from 'src/components/label';
 import axiosInstance, { API_ENDPOINTS } from 'src/utils/axios';
 
+type Case = {
+  caseId: string;
+};
+
 interface Ambulance {
   ambulanceId: number;
   isActive: boolean;
   isMission: boolean;
   ambulanceName: string;
   licensePlate: string;
+  cases: Case[];
 }
 
 export default function CaseAdminAmbulanceList() {
@@ -33,11 +38,11 @@ export default function CaseAdminAmbulanceList() {
 
   const handleClick = useCallback(
     (ambulance: Ambulance) => {
-      if (!ambulance.isActive) {
-        // Vehicle is not ready for use, do nothing
-        return;
-      }
-      router.push(paths.dashboard.caseAdmin.details('16a2c786-d4f4-4951-be41-9cb6ce0762e0'));
+      // Vehicle is not ready for use, not in a mission, or has no cases, do nothing
+      if (!ambulance.isActive || !ambulance.isMission || !ambulance.cases.length) return;
+
+      const { caseId } = ambulance.cases[0];
+      router.push(paths.dashboard.caseAdmin.details(caseId));
     },
     [router]
   );
