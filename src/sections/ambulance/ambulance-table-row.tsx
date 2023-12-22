@@ -65,7 +65,7 @@ export default function AmbulanceTableRow({
             }
             secondary={
               <Box component="div" sx={{ typography: 'body2', color: 'text.disabled' }}>
-                ทะเบียนรถ
+                {row.licensePlate}
               </Box>
             }
           />
