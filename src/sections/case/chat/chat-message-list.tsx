@@ -1,37 +1,54 @@
-import React from 'react';
+import { useCallback, useEffect, useRef } from 'react';
 import Box from '@mui/system/Box';
+import { TChatMessage } from 'src/types/chat';
 import Scrollbar from 'src/components/scrollbar';
 import ChatMessageItem from './chat-message-item';
 
 type Props = {
-  messages: any[];
+  messages: TChatMessage[];
 };
 
 export default function ChatMessageList({ messages }: Props) {
-  const scrollbarRef = React.useRef(null);
+  const scrollbarRef = useRef<HTMLDivElement>(null);
 
-  React.useEffect(() => {
-    if (scrollbarRef.current) {
-      // @ts-ignore
-      scrollbarRef.current.scrollIntoView({ smooth: true });
+  // useEffect(() => {
+  //   if (scrollbarRef.current) {
+  //     // @ts-ignore
+  //     scrollbarRef.current.scrollIntoView({ smooth: true });
+  //   }
+  // }, []);
+
+  // useEffect(() => {
+  //   if (scrollbarRef.current) {
+  //     // Scroll to the bottom of the chat when new messages are received
+  //     scrollbarRef.current.scrollTop = scrollbarRef.current.scrollHeight;
+  //   }
+  // }, [messages]);
+
+  const scrollMessagesToBottom = useCallback(() => {
+    if (!messages) {
+      return;
     }
-  }, []);
 
-  console.log('messages', messages);
+    if (!scrollbarRef.current) {
+      return;
+    }
+
+    if (scrollbarRef.current) {
+      scrollbarRef.current.scrollTop = scrollbarRef.current.scrollHeight;
+    }
+  }, [messages]);
+
+  useEffect(() => {
+    scrollMessagesToBottom();
+  }, [scrollMessagesToBottom]);
 
   return (
     <Scrollbar ref={scrollbarRef} sx={{ p: 3, height: 1 }}>
       <Box>
-        {messages.map((message, index) => (
-          <div key={index}>{message}</div>
+        {messages.map((message) => (
+          <ChatMessageItem key={message.id} messages={message} />
         ))}
-        {/* {messages.map((message) => (
-            <ChatMessageItem
-              key={message.id}
-              message={message}
-              isMine={message.senderId === currentUser.id}
-            />
-          ))} */}
       </Box>
     </Scrollbar>
   );
