@@ -45,9 +45,7 @@ type PatientStatus = {
 };
 
 export default function CasePatientStatus() {
-  const params = useParams();
-  const { id: caseId } = params;
-
+  const { id: caseId } = useParams();
   const [data, setData] = useState<PatientStatus | null>(null);
   const [isLoading, setIsLoading] = useState(false);
 
@@ -83,24 +81,12 @@ export default function CasePatientStatus() {
     // Establish the socket connection
     socket.connect();
 
-    // Listen for the 'pulse' event
-    socket.on('status', (message) => {
-      console.log('socket pulseValue', message);
-
+    // Listen for the event
+    socket.on('status', () => {
       // Update the data in real-time
       fetchData();
-      // setData((prevData) => ({
-      //   ...prevData,
-      //   pulseValue: message.value,
-      // }));
-      // setData((prevData) => ({
-      //   caseId: prevData?.caseId || 'defaultCaseId',
-      //   pulseRateValue: prevData?.pulseRateValue || 'defaultPulseRateValue',
-      //   bloodPressureRateValue: prevData?.bloodPressureRateValue || 'defaultBloodPressureRateValue',
-      //   // ... add default values for all other properties ...
-      //   pulseValue: message.value,
-      // }));
     });
+
     fetchData();
 
     return () => {
@@ -116,61 +102,35 @@ export default function CasePatientStatus() {
 
   console.log('data', data);
 
+  // prettier-ignore
+  const statusBlocks = [
+    { label: 'Pulse', value: data.pulseValue, onClick: quickForms.pulse.onTrue },
+    { label: 'อัตราชีพจร', value: data.pulseRateValue, onClick: quickForms.pulseRate.onTrue },
+    { label: 'ความดันโลหิต', value: data.bloodPressureRateValue, onClick: quickForms.bloodPressureRate.onTrue },
+    { label: 'Respiratory rate', value: data.respiratoryValue, onClick: quickForms.respiratory.onTrue },
+    { label: 'Blood pressure', value: data.bloodPressureValue, onClick: quickForms.bloodPressure.onTrue },
+    { label: 'Body Temperature', value: data.bodyTemperatureValue, onClick: quickForms.bodyTemperature.onTrue },
+    { label: 'Plan score', value: data.planScoreValue, onClick: quickForms.planScore.onTrue },
+    { label: 'Nauro', value: data.nauroValue, onClick: quickForms.nauro.onTrue },
+    { label: 'GCS', value: data.gcsValue, onClick: quickForms.gcs.onTrue },
+    { label: 'DTX', value: data.dtxValue, onClick: quickForms.dtx.onTrue },
+    { label: 'Pupils', value: data.pupilsValue, onClick: quickForms.pupils.onTrue },
+    { label: 'ARI', value: data.ariValue, onClick: quickForms.ari.onTrue },
+  ]
+
+  const renderStatusBlocks = () =>
+    statusBlocks.map((statusBlock, index) => (
+      <Card key={index} className={styles.statusBlock} onClick={statusBlock.onClick}>
+        <Typography variant="subtitle2">{statusBlock.label}</Typography>
+        <Typography variant="body2">{statusBlock.value}</Typography>
+      </Card>
+    ));
+
   return (
     <>
       <div className={styles.staus}>
         <div className={styles.statusTitle}>รายละเอียด</div>
-
-        <div className={styles.statusBlocks}>
-          <Card className={styles.statusBlock} onClick={quickForms.pulse.onTrue}>
-            <Typography variant="subtitle2">Pulse</Typography>
-            <Typography variant="body2">{data.pulseValue}</Typography>
-          </Card>
-          <Card className={styles.statusBlock} onClick={quickForms.pulseRate.onTrue}>
-            <Typography variant="subtitle2">อัตราชีพจร</Typography>
-            <Typography variant="body2">{data.pulseRateValue} / m</Typography>
-          </Card>
-          <Card className={styles.statusBlock} onClick={quickForms.bloodPressureRate.onTrue}>
-            <Typography variant="subtitle2">ความดันโลหิต</Typography>
-            <Typography variant="body2">{data.bloodPressureRateValue} bpm</Typography>
-          </Card>
-          <Card className={styles.statusBlock} onClick={quickForms.respiratory.onTrue}>
-            <Typography variant="subtitle2">Respiratory rate</Typography>
-            <Typography variant="body2">{data.respiratoryValue}</Typography>
-          </Card>
-          <Card className={styles.statusBlock} onClick={quickForms.bloodPressure.onTrue}>
-            <Typography variant="subtitle2">Blood pressure</Typography>
-            <Typography variant="body2">{data.bloodPressureValue}</Typography>
-          </Card>
-          <Card className={styles.statusBlock} onClick={quickForms.bodyTemperature.onTrue}>
-            <Typography variant="subtitle2">Body Temperature</Typography>
-            <Typography variant="body2">{data.bodyTemperatureValue}</Typography>
-          </Card>
-          <Card className={styles.statusBlock} onClick={quickForms.planScore.onTrue}>
-            <Typography variant="subtitle2">Plan score</Typography>
-            <Typography variant="body2">{data.planScoreValue}</Typography>
-          </Card>
-          <Card className={styles.statusBlock} onClick={quickForms.nauro.onTrue}>
-            <Typography variant="subtitle2">Nauro</Typography>
-            <Typography variant="body2">{data.nauroValue}</Typography>
-          </Card>
-          <Card className={styles.statusBlock} onClick={quickForms.gcs.onTrue}>
-            <Typography variant="subtitle2">GCS</Typography>
-            <Typography variant="body2">{data.gcsValue}</Typography>
-          </Card>
-          <Card className={styles.statusBlock} onClick={quickForms.dtx.onTrue}>
-            <Typography variant="subtitle2">DTX</Typography>
-            <Typography variant="body2">{data.dtxValue}</Typography>
-          </Card>
-          <Card className={styles.statusBlock} onClick={quickForms.pupils.onTrue}>
-            <Typography variant="subtitle2">Pupils</Typography>
-            <Typography variant="body2">{data.pupilsValue}</Typography>
-          </Card>
-          <Card className={styles.statusBlock} onClick={quickForms.ari.onTrue}>
-            <Typography variant="subtitle2">ARI</Typography>
-            <Typography variant="body2">{data.ariValue}</Typography>
-          </Card>
-        </div>
+        <div className={styles.statusBlocks}>{renderStatusBlocks()}</div>
       </div>
 
       <CasePatientStatusForm
@@ -245,17 +205,6 @@ export default function CasePatientStatus() {
         onComplete={fetchData}
       />
 
-      {/* <CasePatientStatusForm
-        open={quickForms.gcs.value}
-        onClose={quickForms.gcs.onFalse}
-        data={data.gcsValue}
-        fieldName="gcsValue"
-        isEditing={isEditing}
-        onComplete={fetchData}
-        options={PAIN_SCORE_OPTIONS}
-        options={PAIN_SCORE_OPTIONS}
-        options={PAIN_SCORE_OPTIONS}
-      /> */}
       <CasePatientGCSForm
         open={quickForms.gcs.value}
         onClose={quickForms.gcs.onFalse}
@@ -305,9 +254,6 @@ type FormProps = {
   isEditing?: boolean;
   fieldName: string;
   options?: any[];
-  optionsE?: any[];
-  optionsM?: any[];
-  optionsV?: any[];
   onComplete: () => void;
 };
 
@@ -320,15 +266,13 @@ export function CasePatientStatusForm({
   isEditing,
   fieldName,
   options,
-  optionsE,
-  optionsM,
-  optionsV,
   onComplete,
 }: FormProps) {
-  const params = useParams();
-  const { id: caseId } = params;
+  const { id: caseId } = useParams();
 
   const defaultValues = useMemo(() => ({ [fieldName]: data || '' }), [data, fieldName]);
+
+  console.log('defaultValues', defaultValues);
 
   const methods = useForm<FormValuesProps>({
     defaultValues,
@@ -350,20 +294,8 @@ export function CasePatientStatusForm({
         onClose();
         console.info('DATA', formValues);
 
-        const [keys] = Object.keys(formValues);
-        const [values] = Object.values(formValues);
-
-        const eventName = keys.replace('Value', '').toLowerCase();
-        const message = {
-          value: values,
-          caseId,
-        };
-
-        console.log('eventName', eventName);
-
         // Emit socket event to server
-        // socket.emit(eventName, { data: message });
-        socket.emit('status', message);
+        socket.emit('status');
 
         // Refetch data after successful submission
         onComplete();
@@ -373,70 +305,6 @@ export function CasePatientStatusForm({
     },
     [caseId, isEditing, onClose, onComplete, reset]
   );
-
-  const renderGCSForm = () => (
-    <>
-      <RHFSelect name="eyeOpeningValue" label="Eye Opening">
-        {EYE_OPENING_OPTIONS.map((option) => (
-          <MenuItem key={option.value} value={option.value}>
-            {option.label}
-          </MenuItem>
-        ))}
-      </RHFSelect>
-
-      <RHFSelect name="motorResponseValue" label="Motor Response">
-        {MOTOR_RESPONSE_OPTIONS.map((option) => (
-          <MenuItem key={option.value} value={option.value}>
-            {option.label}
-          </MenuItem>
-        ))}
-      </RHFSelect>
-
-      <RHFSelect name="verbalResponseValue" label="Verbal Response">
-        {VERBAL_RESPONSE_OPTIONS.map((option) => (
-          <MenuItem key={option.value} value={option.value}>
-            {option.label}
-          </MenuItem>
-        ))}
-      </RHFSelect>
-    </>
-  );
-
-  const renderSelectForm = () => {
-    if (options === PAIN_SCORE_OPTIONS) {
-      return (
-        <RHFSelect name={fieldName} label={fieldName}>
-          {options.map((option) => (
-            <MenuItem key={option.value} value={option.value}>
-              {option.label}
-            </MenuItem>
-          ))}
-        </RHFSelect>
-      );
-    }
-    if (options === PUPILS_OPTIONS) {
-      return (
-        <RHFSelect name={fieldName} label={fieldName}>
-          {options.map((option) => (
-            <MenuItem key={option.value} value={option.value}>
-              {option.label}
-            </MenuItem>
-          ))}
-        </RHFSelect>
-      );
-    }
-    return null; // Add this line to fix the eslint error
-  };
-
-  const renderWithCondition = () => {
-    if (fieldName === 'gcsValue') {
-      return renderGCSForm();
-    }
-    if (options) {
-      return renderSelectForm();
-    }
-    return <RHFTextField name={fieldName} label={fieldName} />;
-  };
 
   return (
     <Dialog
@@ -454,7 +322,7 @@ export function CasePatientStatusForm({
           <Stack spacing={2} mt={1}>
             {options ? (
               <RHFSelect name={fieldName} label={fieldName}>
-                <MenuItem value="">ไม่ระบุ</MenuItem>
+                <MenuItem value="-">ไม่ระบุ</MenuItem>
                 <Divider sx={{ borderStyle: 'dashed' }} />
                 {options.map((option) => (
                   <MenuItem key={option.value} value={option.label}>
@@ -465,7 +333,6 @@ export function CasePatientStatusForm({
             ) : (
               <RHFTextField name={fieldName} label={fieldName} />
             )}
-            {/* {renderWithCondition()} */}
           </Stack>
         </DialogContent>
         <DialogActions>
@@ -504,15 +371,16 @@ function CasePatientGCSForm({ open, onClose, onComplete }: any) {
   const onSubmit = useCallback(
     async (formValues: any) => {
       try {
-        await axiosInstance.post(API_ENDPOINTS.casePatientStatus, formValues);
+        await axiosInstance.patch(`${API_ENDPOINTS.casePatientStatus}/${caseId}`, formValues);
         reset();
         onClose();
+        socket.emit('status');
         onComplete();
       } catch (error) {
         console.error(error);
       }
     },
-    [onClose, onComplete, reset]
+    [caseId, onClose, onComplete, reset]
   );
 
   return (
@@ -560,7 +428,7 @@ function CasePatientGCSForm({ open, onClose, onComplete }: any) {
           </Button>
 
           <Button variant="contained" color="primary" type="submit">
-            บันทึก
+            อัปเดต
           </Button>
         </DialogActions>
       </FormProvider>
