@@ -1,11 +1,13 @@
 import { useCallback, useEffect, useState } from 'react';
 import { Box, Card, CardHeader, Stack, Typography } from '@mui/material';
 import { useParams } from 'src/routes/hook';
+import { useSnackbar } from 'src/components/snackbar';
 import Scrollbar from 'src/components/scrollbar';
 import axiosInstance, { API_ENDPOINTS } from 'src/utils/axios';
 
 export default function CaseDetailsDispenser() {
   const { id: caseId } = useParams();
+  const { enqueueSnackbar } = useSnackbar();
   const [data, setData] = useState<any[]>([]);
   const [isLoading, setIsLoading] = useState(false);
 
@@ -14,12 +16,13 @@ export default function CaseDetailsDispenser() {
     try {
       const res = await axiosInstance.get(`${API_ENDPOINTS.cases}/${caseId}`);
       setData(res.data.caseDrugs);
+      enqueueSnackbar('Update success!');
     } catch (error) {
       console.error(error);
     } finally {
       setIsLoading(false);
     }
-  }, [caseId]);
+  }, [caseId, enqueueSnackbar]);
 
   useEffect(() => {
     fetchData();
