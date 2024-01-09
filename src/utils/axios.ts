@@ -29,6 +29,7 @@ export const API_ENDPOINTS = {
   drugs: '/drugs',
   drugCategories: '/drugCategories',
   patients: '/patients',
+  users: '/users',
   auth: {
     me: '/auth/me',
     login: '/auth/login',

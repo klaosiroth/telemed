@@ -110,6 +110,12 @@ export function useNavData() {
             icon: ICONS.menuItem,
             roles: ['admin'],
           },
+          {
+            title: 'ข้อมูลผู้ใช้',
+            path: paths.dashboard.user.root,
+            icon: ICONS.menuItem,
+            roles: ['admin'],
+          },
         ],
       },
     ],
