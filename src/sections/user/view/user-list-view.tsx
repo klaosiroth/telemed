@@ -123,7 +123,7 @@ export default function UserListView() {
   return (
     <Container maxWidth={settings.themeStretch ? false : 'lg'}>
       <TitleBar
-        heading="รายการข้อมูลผู้ป่วย"
+        heading="รายการข้อมูลผู้ใช้งาน"
         action={
           <Button
             component={RouterLink}
