@@ -25,7 +25,7 @@ import { STATUS_OPTIONS } from 'src/constants';
 // ----------------------------------------------------------------------
 
 // Define your form schemas and options
-const Schema = Yup.object().shape({
+const validationSchema = Yup.object().shape({
   // Define validation schema for the information form
   // ...
 });
@@ -44,18 +44,28 @@ type OptionType = {
 export default function UserNewEditForm({ currentData }: Props) {
   const { id } = useParams();
   const router = useRouter();
-  const [ambulances, setAmbulances] = useState<OptionType[]>([]);
+  const [roleOptions, setRoleOptions] = useState<OptionType[]>([]);
+  const [ambulanceOptions, setAmbulanceOptions] = useState<OptionType[]>([]);
 
   const fetchData = useCallback(async () => {
     try {
-      const res = await axiosInstance.get(API_ENDPOINTS.ambulances);
-      console.log('res', res.data);
-      const options = res.data.map((item: any) => ({
+      const [rolesResponse, ambulancesResponse] = await Promise.all([
+        axiosInstance.get(API_ENDPOINTS.roles),
+        axiosInstance.get(API_ENDPOINTS.ambulances),
+      ]);
+
+      const roles = rolesResponse.data.map((item: any) => ({
+        value: item.roleId,
+        label: item.roleName,
+      }));
+
+      const ambulances = ambulancesResponse.data.map((item: any) => ({
         value: item.ambulanceId,
         label: item.licensePlate,
       }));
-      console.log('options', options);
-      setAmbulances(options);
+
+      setRoleOptions(roles);
+      setAmbulanceOptions(ambulances);
     } catch (error) {
       console.error(error);
     }
@@ -64,6 +74,14 @@ export default function UserNewEditForm({ currentData }: Props) {
   useEffect(() => {
     fetchData();
   }, [fetchData]);
+
+  // Find the 'ambulance' role and set it as the default value
+  // const defaultRoleId = roleOptions.find((role) => role.label.toLowerCase() === 'ambulance')?.value;
+
+  // const getDefaultRoleId = useCallback(() => {
+  //   const ambulanceRole = roleOptions.find((role) => role.label.toLowerCase() === 'ambulance');
+  //   return ambulanceRole?.value || ''; // Return roleId if found, otherwise an empty string
+  // }, [roleOptions]);
 
   const defaultValues = useMemo(
     () => ({
@@ -74,6 +92,7 @@ export default function UserNewEditForm({ currentData }: Props) {
       phone: currentData?.phone || '',
       email: currentData?.email || '',
       avatar: currentData?.avatar || '',
+      roleId: currentData?.roleId || '',
       ambulanceId: currentData?.ambulanceId || '',
       isActive: currentData?.isActive || true,
     }),
@@ -81,13 +100,21 @@ export default function UserNewEditForm({ currentData }: Props) {
   );
 
   const methods = useForm<FormValuesProps>({
-    resolver: yupResolver(Schema),
+    resolver: yupResolver(validationSchema),
     defaultValues,
   });
 
-  const { reset, watch, handleSubmit, formState } = methods;
+  const { reset, watch, setValue, handleSubmit, formState } = methods;
   const { isSubmitting } = formState;
   const values = watch();
+
+  useEffect(() => {
+    // Find the 'ambulance' role and set its value as the default roleId
+    const ambulanceRole = roleOptions.find((role) => role.label.toLowerCase() === 'ambulance');
+    if (ambulanceRole) {
+      setValue('roleId', ambulanceRole.value);
+    }
+  }, [roleOptions, setValue]);
 
   const onSubmit = useCallback(
     async (data: FormValuesProps) => {
@@ -119,15 +146,15 @@ export default function UserNewEditForm({ currentData }: Props) {
             display="grid"
             gridTemplateColumns={{
               xs: 'repeat(1, 1fr)',
-              sm: 'repeat(2, 1fr)',
+              sm: 'repeat(3, 1fr)',
             }}
           >
             <RHFTextField name="username" label="ชื่อผู้ใช้" />
             <RHFTextField name="password" type="password" label="รหัสผ่าน" />
+            <RHFTextField name="email" type="email" label="อีเมล" />
             <RHFTextField name="firstname" label="ชื่อ" />
             <RHFTextField name="lastname" label="นามสกุล" />
             <RHFTextField name="phone" label="เบอร์โทร" />
-            <RHFTextField name="email" type="email" label="อีเมล" />
             <RHFSelect name="isActive" label="สถานะ">
               {STATUS_OPTIONS.map((option: any) => (
                 <MenuItem key={option.value} value={option.value}>
@@ -135,10 +162,17 @@ export default function UserNewEditForm({ currentData }: Props) {
                 </MenuItem>
               ))}
             </RHFSelect>
+            <RHFSelect name="roleId" label="สิทธิการใช้งาน">
+              {roleOptions.map((option) => (
+                <MenuItem key={option.value} value={option.value}>
+                  {option.label}
+                </MenuItem>
+              ))}
+            </RHFSelect>
             <RHFSelect name="ambulanceId" label="ทะเบียนรถ">
-              <MenuItem value="-">ไม่ระบุ</MenuItem>
+              <MenuItem value="">ไม่ระบุ</MenuItem>
               <Divider sx={{ borderStyle: 'dashed' }} />
-              {ambulances.map((option) => (
+              {ambulanceOptions.map((option) => (
                 <MenuItem key={option.value} value={option.value}>
                   {option.label}
                 </MenuItem>
