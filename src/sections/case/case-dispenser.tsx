@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useState } from 'react';
-import { Box, Card, CardHeader, Stack, Typography } from '@mui/material';
+import { Card, CardHeader, Stack, Typography } from '@mui/material';
 import { useParams } from 'src/routes/hook';
 import Scrollbar from 'src/components/scrollbar';
 import axiosInstance, { API_ENDPOINTS } from 'src/utils/axios';
