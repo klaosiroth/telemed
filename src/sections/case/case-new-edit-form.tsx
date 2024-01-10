@@ -11,6 +11,7 @@ import { DatePicker } from '@mui/x-date-pickers/DatePicker';
 import { paths } from 'src/routes/paths';
 import { useRouter } from 'src/routes/hook';
 import { useBoolean } from 'src/hooks/use-boolean';
+import { useAuthContext } from 'src/auth/hooks';
 import { ConfirmDialog } from 'src/components/custom-dialog';
 import FormProvider, { RHFSelect, RHFTextField } from 'src/components/hook-form';
 //
@@ -31,8 +32,29 @@ type FormValuesProps = CreateCaseDTO | CreateCaseMissionDTO;
 
 export default function CaseNewEditForm({ currentData }: Props) {
   const router = useRouter();
-
   const confirm = useBoolean();
+  const { user } = useAuthContext();
+
+  const fetchData = useCallback(async () => {
+    try {
+      const res = await axiosInstance.get(API_ENDPOINTS.ambulances);
+      console.log('res', res.data);
+
+      const ambulanceData = res.data.find((item: any) => item.ambulanceId === user?.ambulanceId);
+
+      if (ambulanceData && ambulanceData.cases && ambulanceData.cases.length > 0) {
+        // Redirect to the case page
+        const { caseId } = ambulanceData.cases[0];
+        router.push(paths.dashboard.case.details(caseId));
+      }
+    } catch (error) {
+      console.error(error);
+    }
+  }, [router, user?.ambulanceId]);
+
+  useEffect(() => {
+    fetchData();
+  }, [fetchData]);
 
   const defaultValues = useMemo(
     () => ({
@@ -59,7 +81,6 @@ export default function CaseNewEditForm({ currentData }: Props) {
   });
 
   const { reset, watch, control, handleSubmit } = methods;
-
   const values = watch();
 
   useEffect(() => {
