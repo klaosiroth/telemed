@@ -4,6 +4,7 @@ import { MapContainer, TileLayer, Marker, Popup } from 'react-leaflet';
 import L from 'leaflet';
 import 'leaflet/dist/leaflet.css';
 import './case.css';
+import { socket } from 'src/utils/socket';
 
 // Convert the SVG to a data URL
 const svgString = `
@@ -21,7 +22,7 @@ const customIcon = new L.Icon({
 });
 
 export default function CaseLocationTracker() {
-  const [position, setPosition] = useState<[number, number]>([13.7563, 100.5018]); // Initial map center coordinates
+  const [position, setPosition] = useState<[number, number]>([12.68832, 100.98156]); // Initial map center coordinates
   const mapRef = useRef<any>(null);
 
   useEffect(() => {
@@ -32,6 +33,9 @@ export default function CaseLocationTracker() {
         (location) => {
           const { latitude, longitude } = location.coords;
           setPosition([latitude, longitude]);
+
+          socket.connect();
+          socket.emit('location', [latitude, longitude]);
 
           // Check if the map ref is available
           if (mapRef.current) {
@@ -48,13 +52,16 @@ export default function CaseLocationTracker() {
     // Get the current location immediately when the component mounts
     getCurrentLocation();
 
-    // Set up an interval to get the current location every 5 minutes
+    // Set up an interval to get the current location every 5 seconds
     const intervalId = setInterval(() => {
       getCurrentLocation();
-    }, 5 * 60 * 1000); // 5 minutes in milliseconds
+    }, 5 * 1000); // 5 seconds in milliseconds
 
     // Clear the interval when the component is unmounted
-    return () => clearInterval(intervalId);
+    return () => {
+      clearInterval(intervalId);
+      socket.disconnect(); // Disconnect from the socket.io server when the component is unmounted
+    };
   }, []); // Empty dependency array to run the effect only once when the component mounts
 
   console.log('current position', position);

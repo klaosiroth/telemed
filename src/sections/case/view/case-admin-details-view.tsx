@@ -7,7 +7,7 @@ import Container from '@mui/material/Container';
 //
 import CaseAdminMission from '../case-admin-mission';
 import CaseAdminDispenser from '../case-admin-dispenser';
-import CaseLocationTracker from '../case-location-tracker';
+import CaseAdminLocationTracker from '../case-admin-location-tracker';
 import VideoPlayer from '../case-video-player';
 import Chat from '../chat';
 import CasePatient from '../case-patient';
@@ -37,7 +37,7 @@ export default function CaseAdminDetailsView() {
                 <Tab key={tab.value} value={tab.value} label={tab.label} />
               ))}
             </Tabs>
-            {currentTab === 'map' && <CaseLocationTracker />}
+            {currentTab === 'map' && <CaseAdminLocationTracker />}
             {currentTab === 'info' && <CasePatient />}
           </div>
           <CasePatientStatus />
