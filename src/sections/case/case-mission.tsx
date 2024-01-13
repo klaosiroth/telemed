@@ -1,10 +1,9 @@
-// 'use client';
-
 import { useState } from 'react';
 // @mui
 import Button from '@mui/material/Button';
 // routes
-import { useParams } from 'src/routes/hook';
+import { paths } from 'src/routes/paths';
+import { useParams, useRouter } from 'src/routes/hook';
 // components
 import { ConfirmDialog } from 'src/components/custom-dialog';
 //
@@ -21,6 +20,7 @@ const CASE_MISION = {
 };
 
 const CaseMission = () => {
+  const router = useRouter();
   const params = useParams();
 
   const { id } = params;
@@ -116,13 +116,14 @@ const CaseMission = () => {
   const handleConfirm4Action = async () => {
     try {
       const timestamp = new Date().toISOString();
-      await axiosInstance.post(API_ENDPOINTS.caseMissions.hospital, {
+      await axiosInstance.post(API_ENDPOINTS.caseMissions.finish, {
         caseId: id,
         prefixModal: CASE_MISION.FINISH,
         dateEndMission: new Date(),
       });
       toggleModal4();
       console.log('Modal 4 submitted:', timestamp);
+      router.push(paths.dashboard.root);
     } catch (error) {
       console.error(error);
     }
