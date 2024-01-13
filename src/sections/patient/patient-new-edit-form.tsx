@@ -348,7 +348,7 @@ export default function PatientNewEditForm({ currentData }: Props) {
 
               <Stack alignItems="flex-end" sx={{ mt: 3 }}>
                 <LoadingButton type="submit" variant="contained" loading={isSubmitting}>
-                  {!currentData ? 'Create User' : 'Save Changes'}
+                  {!currentData ? 'บันทึกข้อมูล' : 'อัพเดตข้อมูล'}
                 </LoadingButton>
               </Stack>
             </Card>

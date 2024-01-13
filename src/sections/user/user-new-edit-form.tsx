@@ -182,7 +182,7 @@ export default function UserNewEditForm({ currentData }: Props) {
         </Stack>
         <Stack alignItems="flex-end" sx={{ mt: 3 }}>
           <LoadingButton type="submit" variant="contained" loading={isSubmitting}>
-            {!currentData ? 'เพิ่มข้อมูล' : 'อัปเดตข้อมูล'}
+            {!currentData ? 'บันทึกข้อมูล' : 'อัพเดตข้อมูล'}
           </LoadingButton>
         </Stack>
       </Card>
