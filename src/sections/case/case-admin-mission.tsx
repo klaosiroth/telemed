@@ -3,6 +3,7 @@ import Card from '@mui/material/Card';
 import Typography from '@mui/material/Typography';
 import { useParams } from 'src/routes/hook';
 import axiosInstance, { API_ENDPOINTS } from 'src/utils/axios';
+import { socket } from 'src/utils/socket';
 import styles from './case-mission.module.css';
 
 interface CaseMission {
@@ -29,6 +30,19 @@ export default function CaseAdminMission() {
 
   useEffect(() => {
     fetchData();
+
+    socket.connect();
+
+    const handleMissionUpdate = () => {
+      fetchData();
+    };
+
+    socket.on('missionUpdate', handleMissionUpdate);
+
+    return () => {
+      socket.off('missionUpdate', handleMissionUpdate);
+      socket.disconnect();
+    };
   }, [fetchData]);
 
   const renderCard = (title: string, date: string, formatter: (date: Date) => string) => (
