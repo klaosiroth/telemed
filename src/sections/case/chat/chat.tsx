@@ -1,11 +1,11 @@
-/* eslint-disable import/no-extraneous-dependencies */
-import React, { useEffect, useState } from 'react';
+import React, { useCallback, useEffect, useState } from 'react';
 import { Card, Divider, IconButton, Stack } from '@mui/material';
 import { socket } from 'src/utils/socket';
 import { useParams } from 'src/routes/hook';
 import { useAuthContext } from 'src/auth/hooks';
 import { TChatMessage } from 'src/types/chat';
 import Iconify from 'src/components/iconify';
+import axiosInstance, { API_ENDPOINTS } from 'src/utils/axios';
 import ChatMessageInput from './chat-message-input';
 import ChatMessageList from './chat-message-list';
 
@@ -13,6 +13,16 @@ export default function Chat() {
   const { id: caseId } = useParams();
   const { user } = useAuthContext();
   const [messages, setMessages] = useState<TChatMessage[]>([]);
+
+  const fetchData = useCallback(async () => {
+    try {
+      const res = await axiosInstance.get(`${API_ENDPOINTS.chats}/${caseId}`);
+      setMessages(res.data);
+    } catch (error) {
+      console.error('Error fetching chat data:', error);
+      // Handle the error, e.g., show a user-friendly message to the user
+    }
+  }, [caseId]);
 
   useEffect(() => {
     if (!socket.connected) {
@@ -26,11 +36,13 @@ export default function Chat() {
 
     socket.on('connect_error', handleConnectError);
 
+    fetchData();
+
     return () => {
       socket.off('connect_error', handleConnectError);
       socket.disconnect();
     };
-  }, [caseId]); // Only run the effect on mount and unmount
+  }, [caseId, fetchData]); // Only run the effect on mount and unmount
 
   useEffect(() => {
     const handleReceiveMessage = (message: TChatMessage) => {
@@ -45,11 +57,14 @@ export default function Chat() {
   }, []);
 
   const handleSendMessage = (message: string) => {
-    socket.emit('chat:message', {
+    const payload = {
       message,
       senderId: user?.userId,
       roomId: caseId,
-    });
+    };
+
+    socket.emit('chat:message', payload);
+    axiosInstance.post(API_ENDPOINTS.chats, payload);
   };
 
   return (

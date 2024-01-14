@@ -15,6 +15,8 @@ export default axiosInstance;
 
 export const API_ENDPOINTS = {
   ambulances: '/ambulances',
+  ambulanceCameras: '/ambulanceCameras',
+  chats: '/chat-messages',
   cases: '/cases',
   caseDrugs: '/caseDrugs',
   caseMissions: {
