@@ -1,11 +1,14 @@
 import { useCallback, useEffect, useState } from 'react';
 import { Card, CardHeader, Stack, Typography } from '@mui/material';
 import { useParams } from 'src/routes/hook';
+import { useSnackbar } from 'src/components/snackbar';
 import Scrollbar from 'src/components/scrollbar';
 import axiosInstance, { API_ENDPOINTS } from 'src/utils/axios';
+import { socket } from 'src/utils/socket';
 
 export default function CaseDetailsDispenser() {
   const { id: caseId } = useParams();
+  const { enqueueSnackbar } = useSnackbar();
   const [data, setData] = useState<any[]>([]);
   const [isLoading, setIsLoading] = useState(false);
 
@@ -22,24 +25,16 @@ export default function CaseDetailsDispenser() {
   }, [caseId]);
 
   useEffect(() => {
+    socket.connect();
+    socket.on('dispenser', () => {
+      fetchData();
+      enqueueSnackbar('รายการจ่ายยาใหม่');
+    });
     fetchData();
-  }, [fetchData]);
-
-  // const fetchData = useCallback(async () => {
-  //   setIsLoading(true);
-  //   try {
-  //     const res = await axiosInstance.get(`${API_ENDPOINTS.caseDrugs}/${caseId}`);
-  //     setData(res.data);
-  //   } catch (error) {
-  //     console.error(error);
-  //   } finally {
-  //     setIsLoading(false);
-  //   }
-  // }, [caseId]);
-
-  // useEffect(() => {
-  //   fetchData();
-  // }, [fetchData]);
+    return () => {
+      socket.disconnect();
+    };
+  }, [enqueueSnackbar, fetchData]);
 
   if (isLoading) return <p>Loading...</p>;
 

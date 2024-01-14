@@ -14,6 +14,7 @@ import LoadingButton from '@mui/lab/LoadingButton';
 
 import FormProvider, { RHFAutocomplete, RHFTextField } from 'src/components/hook-form';
 import axiosInstance, { API_ENDPOINTS } from 'src/utils/axios';
+import { socket } from 'src/utils/socket';
 
 type OptionType = {
   value: string;
@@ -76,6 +77,7 @@ export default function CaseDetailsDispenserForm({ open, onClose, onComplete }: 
         reset();
         onClose();
         onComplete();
+        socket.emit('dispenser');
         console.info('DATA', formData);
       } catch (error) {
         console.error(error);
