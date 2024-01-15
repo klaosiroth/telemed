@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 // @mui
 import Button from '@mui/material/Button';
 // routes
@@ -10,16 +10,16 @@ import { ConfirmDialog } from 'src/components/custom-dialog';
 import axiosInstance, { API_ENDPOINTS } from 'src/utils/axios';
 import styles from './case-mission.module.css';
 
-const CASE_MISION = {
+const CASE_MISSION = {
   START: 1,
   ARRIVE: 2,
   LEAVE: 3,
   HOSPITAL: 4,
   FINISH: 5,
-  CANCLE: 6,
+  CANCEL: 6,
 };
 
-const CaseMission = () => {
+export default function CaseMission() {
   const router = useRouter();
   const params = useParams();
 
@@ -29,27 +29,31 @@ const CaseMission = () => {
   const [modal2Open, setModal2Open] = useState(false);
   const [modal3Open, setModal3Open] = useState(false);
   const [modal4Open, setModal4Open] = useState(false);
+  const [isAction1Completed, setIsAction1Completed] = useState(false);
+  const [isAction2Completed, setIsAction2Completed] = useState(false);
+  const [isAction3Completed, setIsAction3Completed] = useState(false);
+  const [isAction4Completed, setIsAction4Completed] = useState(false);
 
-  // const handleModal1Click = () => {
-  //   setModal1Open(!modal1Open);
-  // };
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+        const response = await axiosInstance.get(`${API_ENDPOINTS.cases}/${id}`);
+        const [caseMission] = response.data.caseMissions;
 
-  // const handleModal2Click = () => {
-  //   setModal2Open(!modal2Open);
-  // };
+        // Update state based on API response
+        setIsAction1Completed(caseMission.prefixModal >= CASE_MISSION.ARRIVE);
+        setIsAction2Completed(caseMission.prefixModal >= CASE_MISSION.LEAVE);
+        setIsAction3Completed(caseMission.prefixModal >= CASE_MISSION.HOSPITAL);
+        setIsAction4Completed(caseMission.prefixModal >= CASE_MISSION.FINISH);
 
-  // const handleModal3Click = () => {
-  //   setModal3Open(!modal3Open);
-  // };
+        console.log('response', caseMission);
+      } catch (error) {
+        console.log('error', error);
+      }
+    };
 
-  // const handleModal4Click = () => {
-  //   setModal4Open(!modal4Open);
-  // };
-
-  // const handleFormSubmit = (formData: any) => {
-  //   // Make API request using formData
-  //   // Implement your API logic here
-  // };
+    fetchData();
+  }, [id]);
 
   const toggleModal1 = () => {
     setModal1Open((prev) => !prev);
@@ -71,13 +75,13 @@ const CaseMission = () => {
     try {
       const caseMissionData = {
         caseId: id,
-        prefixModal: CASE_MISION.ARRIVE,
+        prefixModal: CASE_MISSION.ARRIVE,
         dateArriveIncident: new Date(),
       };
       await axiosInstance.post(API_ENDPOINTS.caseMissions.arrive, caseMissionData);
       toggleModal1();
+      setIsAction1Completed(true);
       console.log('Modal 1 submitted:', caseMissionData);
-      // Trigger update on the admin side
     } catch (error) {
       console.error(error);
     }
@@ -87,11 +91,12 @@ const CaseMission = () => {
     try {
       const caseMissionData = {
         caseId: id,
-        prefixModal: CASE_MISION.LEAVE,
+        prefixModal: CASE_MISSION.LEAVE,
         dateLeavingScene: new Date(),
       };
       await axiosInstance.post(API_ENDPOINTS.caseMissions.leave, caseMissionData);
       toggleModal2();
+      setIsAction2Completed(true);
       console.log('Modal 2 submitted:', caseMissionData);
     } catch (error) {
       console.error(error);
@@ -102,11 +107,12 @@ const CaseMission = () => {
     try {
       const caseMissionData = {
         caseId: id,
-        prefixModal: CASE_MISION.HOSPITAL,
+        prefixModal: CASE_MISSION.HOSPITAL,
         dateArriveHospital: new Date(),
       };
       await axiosInstance.post(API_ENDPOINTS.caseMissions.hospital, caseMissionData);
       toggleModal3();
+      setIsAction3Completed(true);
       console.log('Modal 3 submitted:', caseMissionData);
     } catch (error) {
       console.error(error);
@@ -115,14 +121,15 @@ const CaseMission = () => {
 
   const handleConfirm4Action = async () => {
     try {
-      const timestamp = new Date().toISOString();
-      await axiosInstance.post(API_ENDPOINTS.caseMissions.finish, {
+      const caseMissionData = {
         caseId: id,
-        prefixModal: CASE_MISION.FINISH,
+        prefixModal: CASE_MISSION.FINISH,
         dateEndMission: new Date(),
-      });
+      };
+      await axiosInstance.post(API_ENDPOINTS.caseMissions.finish, caseMissionData);
       toggleModal4();
-      console.log('Modal 4 submitted:', timestamp);
+      setIsAction4Completed(true);
+      console.log('Modal 4 submitted:', caseMissionData);
       router.push(paths.dashboard.root);
     } catch (error) {
       console.error(error);
@@ -132,16 +139,36 @@ const CaseMission = () => {
   return (
     <>
       <section className={styles.menu}>
-        <Button className={styles.menuItem} variant="contained" onClick={toggleModal1}>
+        <Button
+          className={styles.menuItem}
+          color={isAction1Completed ? 'success' : 'inherit'}
+          variant="contained"
+          onClick={toggleModal1}
+        >
           ถึงที่เกิดเหตุ
         </Button>
-        <Button className={styles.menuItem} variant="contained" onClick={toggleModal2}>
+        <Button
+          className={styles.menuItem}
+          color={isAction2Completed ? 'success' : 'inherit'}
+          variant="contained"
+          onClick={toggleModal2}
+        >
           ออกจากที่เกิดเหตุ
         </Button>
-        <Button className={styles.menuItem} variant="contained" onClick={toggleModal3}>
+        <Button
+          className={styles.menuItem}
+          color={isAction3Completed ? 'success' : 'inherit'}
+          variant="contained"
+          onClick={toggleModal3}
+        >
           ถึงสถานพยาบาล
         </Button>
-        <Button className={styles.menuItem} variant="contained" onClick={toggleModal4}>
+        <Button
+          className={styles.menuItem}
+          color={isAction4Completed ? 'success' : 'inherit'}
+          variant="contained"
+          onClick={toggleModal4}
+        >
           จบภาระกิจ
         </Button>
       </section>
@@ -212,36 +239,7 @@ const CaseMission = () => {
       />
     </>
   );
-};
-
-export default CaseMission;
-
-// const stypes = {
-//   `.menu {
-//     grid-area: menu;
-//     display: flex;
-//     gap: 0.5rem;
-
-//   }
-
-//   .menuItem {
-//     flex: 1;
-//     display: flex;
-//     align-items: center;
-//     justify-content: center;
-//     text-align: center;
-//     height: 100%;
-//     position: relative;
-//   }
-
-//   .menuItem::before {
-//     content: "";
-//     display: inline-block;
-//     vertical-align: middle;
-//     height: 100%;
-//   }
-//   `
-// }
+}
 
 const getCurrentDateTimeString = () => {
   const now = new Date();
@@ -251,105 +249,3 @@ const getCurrentDateTimeString = () => {
   const formattedTime = `${hours}.${minutes} น.`;
   return `วันที่ ${formattedDate} เวลา ${formattedTime}`;
 };
-// import { useState } from 'react';
-// import Button from '@mui/material/Button';
-// import { useParams } from 'src/routes/hook';
-// import { ConfirmDialog } from 'src/components/custom-dialog';
-// import axiosInstance, { API_ENDPOINTS } from 'src/utils/axios';
-// import styles from './case-mission.module.css';
-
-// const CASE_MISSION = {
-//   START: 1,
-//   ARRIVE: 2,
-//   LEAVE: 3,
-//   HOSPITAL: 4,
-//   FINISH: 5,
-//   CANCEL: 6,
-// };
-
-// const modalTitles = {
-//   1: 'ถึงที่เกิดเหตุ',
-//   2: 'ออกจากที่เกิดเหตุ',
-//   3: 'ถึงสถานพยาบาล',
-//   4: 'จบภาระกิจ',
-// };
-
-// const CaseMission = () => {
-//   const params = useParams();
-//   const { id } = params;
-
-//   const [modals, setModals] = useState([false, false, false, false]);
-
-//   const toggleModal = (index: number) => {
-//     setModals((prevModals) => {
-//       const updatedModals = [...prevModals];
-//       updatedModals[index] = !updatedModals[index];
-//       return updatedModals;
-//     });
-//   };
-
-//   const handleConfirmAction = async (prefixModal: number) => {
-//     try {
-//       const caseMissionData = {
-//         caseId: id,
-//         prefixModal,
-//         dateArriveIncident: new Date(),
-//       };
-
-//       await axiosInstance.post(API_ENDPOINTS.caseMissions[prefixModal], {
-//         caseMissionData,
-//       });
-
-//       const modalIndex = prefixModal - 1;
-//       toggleModal(modalIndex);
-//       console.log(`Modal ${modalIndex + 1} submitted:`, caseMissionData);
-//     } catch (error) {
-//       console.error(error);
-//     }
-//   };
-
-//   const createModal = (index) => (
-//     <ConfirmDialog
-//       key={index}
-//       open={modals[index]}
-//       onClose={() => toggleModal(index)}
-//       title={modalTitles[index + 1]}
-//       content={`ยืนยันการ${modalTitles[index + 1]} ช่วยเหลือผู้ป่วย\n${getCurrentDateTimeString()}`}
-//       action={
-//         <Button variant="contained" color="primary" onClick={() => handleConfirmAction(index + 1)}>
-//           ยืนยัน
-//         </Button>
-//       }
-//     />
-//   );
-
-//   return (
-//     <div>
-//       <section className={styles.menu}>
-//         {[1, 2, 3, 4].map((index) => (
-//           <Button
-//             key={index}
-//             className={styles.menuItem}
-//             variant="contained"
-//             onClick={() => toggleModal(index - 1)}
-//           >
-//             {modalTitles[index]}
-//           </Button>
-//         ))}
-//       </section>
-
-//       {modals.map((_, index) => createModal(index))}
-//     </div>
-//   );
-// };
-
-// export default CaseMission;
-
-// const getCurrentDateTimeString = () => {
-//   const now = new Date();
-//   const formattedDate = `${now.getDate()}/${now.getMonth() + 1}/${now.getFullYear() + 543}`;
-//   const hours = now.getHours();
-//   const minutes = now.getMinutes() < 10 ? `0${now.getMinutes()}` : now.getMinutes();
-//   const formattedTime = `${hours}.${minutes} น.`;
-//   return `วันที่ ${formattedDate} เวลา ${formattedTime}`;
-// };

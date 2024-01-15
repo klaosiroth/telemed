@@ -25,7 +25,7 @@ export const API_ENDPOINTS = {
     leave: '/caseMissions/leavingScene',
     hospital: '/caseMissions/arriveHospital',
     finish: '/caseMissions/endMission',
-    cancle: '/caseMissions/cancelMission',
+    cancel: '/caseMissions/cancelMission',
   },
   casePatientStatus: '/casePatientStatus',
   drugs: '/drugs',
