@@ -6,7 +6,8 @@ import styles from './case-mission.module.css';
 
 type Camera = {
   ambulanceCameraId: string;
-  deviceUrl: string;
+  // deviceUrl: string; // rtmpStreamURL
+  deviceUrlRender: string;
 };
 
 export default function CaseVideoPlayer() {
@@ -31,8 +32,7 @@ export default function CaseVideoPlayer() {
     cameras.map((camera) => (
       <div key={camera.ambulanceCameraId} className={styles.video}>
         <ReactPlayer
-          // url={camera.deviceUrl} // rtmpStreamURL
-          url="https://isgpopen.ezvizlife.com/v3/openlive/BB0537990_1_2.m3u8?expire=1765456203&id=658405916897087488&c=d8add32561&t=114eebb148ae7e95457c9098d60d66631ab4425c0e68a258560fccf285b201d7&ev=100"
+          url={camera.deviceUrlRender}
           playing
           controls={false}
           width="100%"
