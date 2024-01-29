@@ -35,6 +35,7 @@ export default function Chat() {
     if (!socket.connected) {
       socket.connect();
       socket.emit('chat:room', caseId);
+      socket.emit('audio:create or join', caseId);
     }
 
     const handleConnectError = (error: unknown) => {
