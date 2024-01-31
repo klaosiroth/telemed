@@ -16,7 +16,7 @@ export default function Chat() {
   const [messages, setMessages] = useState<TChatMessage[]>([]);
   const localAudioRef = useRef<HTMLAudioElement>(null);
   const remoteAudioRef = useRef<HTMLAudioElement>(null);
-  const [peerConnection, setPeerConnection] = useState<RTCPeerConnection | null>(null);
+  const pcRef = useRef<RTCPeerConnection | null>(null);
   const [isAudioEnabled, setIsAudioEnabled] = useState(true);
   const audioStream = useRef<MediaStream | null>(null);
   const [hasCallBeenMade, setHasCallBeenMade] = useState(false);
@@ -53,14 +53,13 @@ export default function Chat() {
   }, [caseId, fetchData]); // Only run the effect on mount and unmount
 
   useEffect(() => {
+    setupMedia();
+
     const handleReceiveMessage = (message: TChatMessage) => {
       setMessages((prevMessages) => [...prevMessages, message]);
     };
 
     socket.on('chat:message', handleReceiveMessage);
-
-    setupMedia();
-    makeCall();
     socket.on('offer', handleOffer);
     socket.on('answer', handleAnswer);
     socket.on('candidate', handleCandidate);
@@ -87,46 +86,42 @@ export default function Chat() {
 
   const setupMedia = useCallback(async () => {
     try {
-      const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+      const stream = await navigator.mediaDevices.getUserMedia({
+        audio: { echoCancellation: true },
+      });
       audioStream.current = stream;
-      if (localAudioRef.current) {
-        localAudioRef.current.srcObject = stream;
-      }
-      setupPeerConnection(stream);
+      if (localAudioRef.current) localAudioRef.current.srcObject = stream;
+      const iceConfig = { iceServers: [{ urls: 'stun:stun.l.google.com:19302' }] };
+      pcRef.current = new RTCPeerConnection(iceConfig);
+
+      stream.getTracks().forEach((track) => pcRef.current!.addTrack(track, stream));
+
+      pcRef.current.onicecandidate = (event) => {
+        if (event.candidate) {
+          socket.emit('audio:candidate', {
+            type: 'candidate',
+            label: event.candidate.sdpMLineIndex,
+            id: event.candidate.sdpMid,
+            candidate: event.candidate.candidate,
+            room: caseId,
+          });
+        }
+      };
+
+      pcRef.current.ontrack = (event) => {
+        if (remoteAudioRef.current) {
+          remoteAudioRef.current.srcObject = event.streams[0];
+        }
+      };
     } catch (error) {
       console.error('Error accessing media devices:', error);
     }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
-
-  function setupPeerConnection(stream: MediaStream) {
-    const configuration = { iceServers: [{ urls: 'stun:stun.l.google.com:19302' }] };
-    const newPeerConnection = new RTCPeerConnection(configuration);
-    setPeerConnection(newPeerConnection);
-
-    stream.getTracks().forEach((track) => newPeerConnection.addTrack(track, stream));
-
-    newPeerConnection.onicecandidate = (event) => {
-      if (event.candidate) {
-        socket.emit('audio:candidate', {
-          type: 'candidate',
-          label: event.candidate.sdpMLineIndex,
-          id: event.candidate.sdpMid,
-          candidate: event.candidate.candidate,
-          room: caseId,
-        });
-      }
-    };
-
-    newPeerConnection.ontrack = (event) => {
-      remoteAudioRef.current!.srcObject = event.streams[0];
-    };
-  }
+  }, [caseId]);
 
   async function makeCall() {
-    if (peerConnection) {
-      const offer = await peerConnection.createOffer();
-      await peerConnection.setLocalDescription(offer);
+    if (pcRef.current) {
+      const offer = await pcRef.current.createOffer();
+      await pcRef.current.setLocalDescription(offer);
       socket.emit('audio:offer', {
         type: 'offer',
         sdp: offer,
@@ -136,26 +131,51 @@ export default function Chat() {
   }
 
   async function handleOffer(offer: RTCSessionDescriptionInit) {
-    if (peerConnection) {
-      await peerConnection.setRemoteDescription(new RTCSessionDescription(offer));
-      const answer = await peerConnection.createAnswer();
-      await peerConnection.setLocalDescription(answer);
-      socket.emit('audio:answer', {
-        type: 'answer',
-        sdp: answer,
-        room: caseId,
-      });
+    if (!pcRef.current) {
+      console.error('existing peerconnection');
+      return;
     }
+    await pcRef.current.setRemoteDescription(new RTCSessionDescription(offer));
+    const answer = await pcRef.current.createAnswer();
+    await pcRef.current.setLocalDescription(answer);
+    socket.emit('audio:answer', {
+      type: 'answer',
+      sdp: answer,
+      room: caseId,
+    });
+
+    // if (pcRef.current) {
+    //   await pcRef.current.setRemoteDescription(new RTCSessionDescription(offer));
+    //   const answer = await pcRef.current.createAnswer();
+    //   await pcRef.current.setLocalDescription(answer);
+    //   socket.emit('audio:answer', {
+    //     type: 'answer',
+    //     sdp: answer,
+    //     room: caseId,
+    //   });
+    // }
   }
 
   async function handleAnswer(answer: RTCSessionDescriptionInit) {
-    if (peerConnection) {
-      await peerConnection.setRemoteDescription(new RTCSessionDescription(answer));
+    if (!pcRef.current) {
+      console.error('no peerconnection');
+      return;
     }
+    await pcRef.current.setRemoteDescription(new RTCSessionDescription(answer));
+
+    // if (pcRef.current) {
+    //   await pcRef.current.setRemoteDescription(new RTCSessionDescription(answer));
+    // }
   }
 
-  function handleCandidate(candidate: RTCIceCandidate) {
-    peerConnection?.addIceCandidate(new RTCIceCandidate(candidate));
+  async function handleCandidate(candidate: RTCIceCandidate) {
+    if (!pcRef.current) {
+      console.error('no peerconnection');
+      return;
+    }
+    await pcRef.current.addIceCandidate(candidate);
+
+    // pcRef.current?.addIceCandidate(new RTCIceCandidate(candidate));
   }
 
   const toggleAudio = async () => {
@@ -171,8 +191,6 @@ export default function Chat() {
       setIsAudioEnabled(!isAudioEnabled);
     }
   };
-
-  console.log('peerConnection', peerConnection);
 
   return (
     <>
@@ -210,8 +228,10 @@ export default function Chat() {
           <ChatMessageInput onSendMessage={handleSendMessage} />
         </Stack>
       </Stack>
-      <audio ref={localAudioRef} autoPlay controls style={{ display: 'none' }} />
-      <audio ref={remoteAudioRef} autoPlay controls style={{ display: 'none' }} />
+      <audio ref={localAudioRef} autoPlay controls muted />
+      <audio ref={remoteAudioRef} autoPlay controls />
+      {/* <audio ref={localAudioRef} autoPlay controls style={{ display: 'none' }} />
+      <audio ref={remoteAudioRef} autoPlay controls style={{ display: 'none' }} /> */}
     </>
   );
 }
