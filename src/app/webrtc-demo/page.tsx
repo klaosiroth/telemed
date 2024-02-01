@@ -1,7 +1,7 @@
 'use client';
 
 /* eslint-disable jsx-a11y/media-has-caption */
-import { useCallback, useEffect, useRef, useState } from 'react';
+import React, { useCallback, useEffect, useRef, useState } from 'react';
 import { io } from 'socket.io-client';
 // import styles from './page.module.css';
 import './styles.css';
@@ -104,7 +104,6 @@ export default function Page() {
     //   console.error('no peerconnection');
     //   return;
     // }
-
     // try {
     //   await pcRef.current.addIceCandidate(new RTCIceCandidate(candidate));
     // } catch (error) {
