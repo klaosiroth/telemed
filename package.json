@@ -27,6 +27,7 @@
     "@mui/material": "^5.13.3",
     "@mui/system": "^5.13.2",
     "@mui/x-date-pickers": "^6.6.0",
+    "agora-rtc-sdk-ng": "^4.20.0",
     "autosuggest-highlight": "^3.3.4",
     "axios": "^1.4.0",
     "date-fns": "^2.30.0",
