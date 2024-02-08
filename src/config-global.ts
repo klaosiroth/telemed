@@ -8,6 +8,11 @@ export const HOST_API = process.env.NEXT_PUBLIC_HOST_API;
 export const SOCKET_API = process.env.NEXT_PUBLIC_SOCKET_API;
 export const ASSETS_API = process.env.NEXT_PUBLIC_ASSETS_API;
 
+export const AGORA = {
+  appId: process.env.NEXT_PUBLIC_AGORA_APP_ID,
+  token: process.env.NEXT_PUBLIC_AGORA_TOKEN,
+};
+
 export const FIREBASE_API = {
   apiKey: process.env.NEXT_PUBLIC_FIREBASE_API_KEY,
   authDomain: process.env.NEXT_PUBLIC_FIREBASE_AUTH_DOMAIN,
