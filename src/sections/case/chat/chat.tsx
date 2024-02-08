@@ -2,7 +2,8 @@
 import React, { useCallback, useEffect, useRef, useState } from 'react';
 import { Card, Divider, IconButton, Stack } from '@mui/material';
 import AgoraRTC from 'agora-rtc-sdk-ng';
-import { AGORA } from 'src/config-global';
+import { RtcTokenBuilder, RtcRole } from 'agora-token';
+// import { AGORA } from 'src/config-global';
 import { socket } from 'src/utils/socket';
 import { useParams } from 'src/routes/hook';
 import { useAuthContext } from 'src/auth/hooks';
@@ -11,8 +12,6 @@ import Iconify from 'src/components/iconify';
 import axiosInstance, { API_ENDPOINTS } from 'src/utils/axios';
 import ChatMessageInput from './chat-message-input';
 import ChatMessageList from './chat-message-list';
-
-const channel = 'ambulance';
 
 export default function Chat() {
   const { id: caseId } = useParams();
@@ -81,15 +80,33 @@ export default function Chat() {
 
   useEffect(() => {
     async function initializeAgora() {
+      const appId = '217479670fa24d3ea9afc0dba3fb5ed6';
+      const appCertificate = '60d4c3aefa2c43a38c0b05ddb688da18';
+      const channelName = caseId;
+      const uid: any = '';
+      const role = RtcRole.PUBLISHER;
+      const expirationTimeInSeconds = 18000;
+      const currentTimestamp = Math.floor(Date.now() / 1000);
+      const privilegeExpiredTs = currentTimestamp + expirationTimeInSeconds;
+
+      const token = RtcTokenBuilder.buildTokenWithUid(
+        appId,
+        appCertificate,
+        channelName,
+        uid,
+        role,
+        expirationTimeInSeconds,
+        privilegeExpiredTs
+      );
+      console.log(`Token With Integer Number Uid: ${token}`);
       client.current = AgoraRTC.createClient({ codec: 'vp8', mode: 'rtc' });
 
       // Initialize local stream
       localStream.current = await AgoraRTC.createMicrophoneAudioTrack();
-      await client.current.join(AGORA.appId, channel, AGORA.token || null, null);
+      await client.current.join(appId, channelName, token || null, null);
 
       // Join the Agora channel
       client.current.on('user-published', async (streamId: any, mediaType: any) => {
-        console.log('streamId ====', streamId);
         await client.current.subscribe(streamId, mediaType);
         if (mediaType === 'audio') {
           remoteStream.current = streamId.audioTrack;
