@@ -23,6 +23,9 @@ export default function Chat() {
   const localStream = useRef<any>(null);
   const remoteStream = useRef<any>(null);
   const [isMuted, setIsMuted] = useState(false);
+  const mrRef = useRef<MediaRecorder | null>(null);
+  const audioChunksRef = useRef<Blob[]>([]);
+  const dataType = 'audio/m4a';
 
   const fetchData = useCallback(async () => {
     try {
@@ -59,10 +62,17 @@ export default function Chat() {
       setMessages((prevMessages) => [...prevMessages, message]);
     };
 
+    const handleReceiveAudio = async () => {
+      localStream.current.setEnabled(false);
+      await stopRecorder();
+    };
+
     socket.on('chat:message', handleReceiveMessage);
+    socket.on('audio:stop', handleReceiveAudio);
 
     return () => {
       socket.off('chat:message', handleReceiveMessage);
+      socket.off('audio:stop', handleReceiveAudio);
     };
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
@@ -76,6 +86,48 @@ export default function Chat() {
 
     socket.emit('chat:message', payload);
     axiosInstance.post(API_ENDPOINTS.chats, payload);
+  };
+
+  const mediaRecorder = async () => {
+    const streamData = await navigator.mediaDevices.getUserMedia({
+      audio: true,
+      video: false,
+    });
+
+    mrRef.current = null;
+    audioChunksRef.current = [];
+
+    const newMediaRecorder = new MediaRecorder(streamData!, {
+      audioBitsPerSecond: 16 * 44100,
+    });
+    mrRef.current = newMediaRecorder;
+
+    const localAudioChunks = []; // [Blob];
+    newMediaRecorder.start();
+    newMediaRecorder.ondataavailable = (event) => {
+      if (typeof event.data === 'undefined') return;
+      if (event.data.size === 0) return;
+      localAudioChunks.push(event.data);
+      audioChunksRef.current.push(event.data);
+    };
+  };
+
+  const stopRecorder = async () => {
+    if (!mrRef.current) return;
+    mrRef.current?.stop();
+    mrRef.current.onstop = async () => {
+      const audioBlob = new Blob(audioChunksRef.current, { type: dataType });
+      const file = new File([audioBlob], 'recording.m4a');
+
+      const formData = new FormData();
+      formData.append('file', file);
+
+      await axiosInstance.post(`${API_ENDPOINTS.caseAudio}/${caseId}`, formData, {
+        headers: {
+          'content-type': 'multipart/form-data',
+        },
+      });
+    };
   };
 
   useEffect(() => {
@@ -124,6 +176,7 @@ export default function Chat() {
     }
 
     initializeAgora();
+    mediaRecorder();
 
     return () => {
       if (client.current) {
@@ -132,12 +185,14 @@ export default function Chat() {
     };
   }, [caseId]);
 
-  const toggleMute = () => {
+  const toggleMute = async () => {
     if (localStream.current) {
       if (!isMuted) {
         localStream.current.setEnabled(false);
+        await stopRecorder();
       } else {
         localStream.current.setEnabled(true);
+        await mediaRecorder();
       }
       setIsMuted(!isMuted);
     }

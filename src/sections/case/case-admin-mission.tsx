@@ -21,6 +21,7 @@ export default function CaseAdminMission() {
     try {
       const response = await axiosInstance.get(`${API_ENDPOINTS.cases}/${caseId}`);
       const [caseMission] = response.data.caseMissions;
+      if (caseMission.dateEndMission) socket.emit('audio:stop', caseId);
       setData(caseMission);
     } catch (error) {
       console.error('Error fetching data:', error);

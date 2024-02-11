@@ -18,6 +18,7 @@ export const API_ENDPOINTS = {
   ambulanceCameras: '/ambulanceCameras',
   chats: '/chat-messages',
   cases: '/cases',
+  caseAudio: '/cases/audio',
   caseDrugs: '/caseDrugs',
   caseMissions: {
     start: '/caseMissions/startMission',
