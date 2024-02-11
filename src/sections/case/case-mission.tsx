@@ -4,6 +4,7 @@ import Button from '@mui/material/Button';
 // routes
 import { paths } from 'src/routes/paths';
 import { useParams, useRouter } from 'src/routes/hook';
+import { socket } from 'src/utils/socket';
 // components
 import { ConfirmDialog } from 'src/components/custom-dialog';
 //
@@ -33,6 +34,14 @@ export default function CaseMission() {
   const [isAction2Completed, setIsAction2Completed] = useState(false);
   const [isAction3Completed, setIsAction3Completed] = useState(false);
   const [isAction4Completed, setIsAction4Completed] = useState(false);
+
+  useEffect(() => {
+    socket.connect();
+
+    return () => {
+      socket.disconnect();
+    };
+  }, []);
 
   useEffect(() => {
     const fetchData = async () => {
@@ -127,10 +136,14 @@ export default function CaseMission() {
         dateEndMission: new Date(),
       };
       await axiosInstance.post(API_ENDPOINTS.caseMissions.finish, caseMissionData);
-      toggleModal4();
-      setIsAction4Completed(true);
-      console.log('Modal 4 submitted:', caseMissionData);
-      router.push(paths.dashboard.root);
+      socket.emit('audio:stop', id);
+      // await new Promise((resolve) => setTimeout(resolve, 1000));
+      setTimeout(async () => {
+        toggleModal4();
+        setIsAction4Completed(true);
+        console.log('Modal 4 submitted:', caseMissionData);
+        router.push(paths.dashboard.root);
+      }, 3000);
     } catch (error) {
       console.error(error);
     }
@@ -169,7 +182,7 @@ export default function CaseMission() {
           variant="contained"
           onClick={toggleModal4}
         >
-          จบภาระกิจ
+          จบภารกิจ
         </Button>
       </section>
 
@@ -224,7 +237,7 @@ export default function CaseMission() {
       <ConfirmDialog
         open={modal4Open}
         onClose={toggleModal4}
-        title="จบภาระกิจ"
+        title="จบภารกิจ"
         content={
           <>
             ยืนยันการจบภารกิจ ช่วยเหลือผู้ป่วย <br />

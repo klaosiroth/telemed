@@ -21,7 +21,6 @@ export default function CaseAdminMission() {
     try {
       const response = await axiosInstance.get(`${API_ENDPOINTS.cases}/${caseId}`);
       const [caseMission] = response.data.caseMissions;
-      if (caseMission.dateEndMission) socket.emit('audio:stop', caseId);
       setData(caseMission);
     } catch (error) {
       console.error('Error fetching data:', error);
@@ -59,7 +58,7 @@ export default function CaseAdminMission() {
       {renderCard('ถึงที่เกิดเหตุ', data?.dateArriveIncident || '', formatTime)}
       {renderCard('ออกจากที่เกิดเหตุ', data?.dateLeavingScene || '', formatTime)}
       {renderCard('ถึงสถานพยาบาล', data?.dateArriveHospital || '', formatTime)}
-      {renderCard('จบภาระกิจ', data?.dateEndMission || '', formatTime)}
+      {renderCard('จบภารกิจ', data?.dateEndMission || '', formatTime)}
     </section>
   );
 }

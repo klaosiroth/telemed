@@ -26,10 +26,16 @@ export default function Chat() {
   const mrRef = useRef<MediaRecorder | null>(null);
   const audioChunksRef = useRef<Blob[]>([]);
   const dataType = 'audio/m4a';
+  const isFinishRef = useRef(false);
 
   const fetchData = useCallback(async () => {
     try {
       const res = await axiosInstance.get(`${API_ENDPOINTS.chats}/${caseId}`);
+      const response = await axiosInstance.get(`${API_ENDPOINTS.cases}/${caseId}`);
+      const [caseMission] = response.data.caseMissions;
+      if (caseMission.dateEndMission) {
+        isFinishRef.current = true;
+      }
       setMessages(res.data);
     } catch (error) {
       console.error('Error fetching chat data:', error);
@@ -65,6 +71,7 @@ export default function Chat() {
     const handleReceiveAudio = async () => {
       localStream.current.setEnabled(false);
       await stopRecorder();
+      fetchData();
     };
 
     socket.on('chat:message', handleReceiveMessage);
@@ -186,6 +193,8 @@ export default function Chat() {
   }, [caseId]);
 
   const toggleMute = async () => {
+    if (isFinishRef.current) return;
+
     if (localStream.current) {
       if (!isMuted) {
         localStream.current.setEnabled(false);
