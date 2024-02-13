@@ -18,6 +18,7 @@ import FormProvider, { RHFSelect, RHFTextField } from 'src/components/hook-form'
 import { Case, CreateCaseDTO, CreateCaseMissionDTO } from 'src/types/case';
 import axiosInstance, { API_ENDPOINTS } from 'src/utils/axios';
 import { PREFIX_OPTIONS } from 'src/constants';
+import { socket } from 'src/utils/socket';
 
 // Define your form schemas and options
 const Schema = Yup.object().shape({
@@ -53,7 +54,12 @@ export default function CaseNewEditForm({ currentData }: Props) {
   }, [router, user?.ambulanceId]);
 
   useEffect(() => {
+    socket.connect();
     fetchData();
+
+    return () => {
+      socket.disconnect();
+    };
   }, [fetchData]);
 
   const defaultValues = useMemo(
@@ -116,6 +122,7 @@ export default function CaseNewEditForm({ currentData }: Props) {
           ariValue: '-',
         });
         router.push(paths.dashboard.case.details(newCaseId));
+        socket.emit('CreateCase');
         console.info('Form submitted:', data);
       } catch (error) {
         console.error('Error submitting form:', error);

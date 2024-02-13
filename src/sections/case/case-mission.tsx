@@ -137,6 +137,7 @@ export default function CaseMission() {
       };
       await axiosInstance.post(API_ENDPOINTS.caseMissions.finish, caseMissionData);
       socket.emit('audio:stop', id);
+      socket.emit('CreateCase');
       // await new Promise((resolve) => setTimeout(resolve, 1000));
       setTimeout(async () => {
         toggleModal4();

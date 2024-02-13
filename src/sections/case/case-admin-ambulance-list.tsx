@@ -4,6 +4,7 @@ import { paths } from 'src/routes/paths';
 import { useRouter } from 'src/routes/hook';
 import Label from 'src/components/label';
 import axiosInstance, { API_ENDPOINTS } from 'src/utils/axios';
+import { socket } from 'src/utils/socket';
 
 type Case = {
   caseId: string;
@@ -34,6 +35,13 @@ export default function CaseAdminAmbulanceList() {
 
   useEffect(() => {
     fetchData();
+    socket.connect();
+    socket.on('CreateCase', () => fetchData());
+
+    return () => {
+      socket.disconnect();
+      socket.off('CreateCase');
+    };
   }, [fetchData]);
 
   const handleClick = useCallback(
