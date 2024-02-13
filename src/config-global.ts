@@ -10,6 +10,7 @@ export const ASSETS_API = process.env.NEXT_PUBLIC_ASSETS_API;
 
 export const AGORA = {
   appId: process.env.NEXT_PUBLIC_AGORA_APP_ID,
+  appCertificate: process.env.NEXT_PUBLIC_AGORA_APP_CERTIFICATE_ID,
   token: process.env.NEXT_PUBLIC_AGORA_TOKEN,
 };
 
